@@ -1,0 +1,11 @@
+{
+  "name": "hip-hop-histories-atlas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "validate:data": "node scripts/validate.mjs",
+    "test": "npm run validate:data && npm run build && node --test tests/rendered-html.test.mjs"
+  }
+}

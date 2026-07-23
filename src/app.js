@@ -1,0 +1,1420 @@
+const LOCALES = ["zh", "en"];
+
+const UI = {
+  zh: {
+    kicker: "BORN IN THE BRONX · BUILT FOR THE WORLD",
+    title: "嘻哈脈絡",
+    search: "找 DJ、crew、城市、聲音，或直接搜一段故事…",
+    searchHint: "按 / 開挖",
+    domains: "搭哪一條線？",
+    domainsSub: "18 條路線 · 216 個故事站",
+    graphTitle: "把唱片轉起來：每個點，都是一段真的街頭故事",
+    graphSub: "拖著黑膠轉、用滾輪靠近，或沿地鐵線換站。線不是裝飾，它們在說：誰影響誰、聲音怎麼旅行、誰又把規則翻新。",
+    visible: "現在亮著",
+    nodes: "站",
+    playing: "NOW SPINNING · 正在播放",
+    timeline: "搭時光車",
+    timelineSub: "再點一次回到全線",
+    relations: "只看這種連線",
+    all: "全部",
+    selectPrompt: "隨便點一顆，讓它把故事講完",
+    selectBody: "這裡不考你背年份。每一站會先講人、場景和聲音，再告訴你它為什麼有料、真實世界發生過什麼，以及哪些傳說別急著全信。",
+    domainsStat: "條線",
+    nodesStat: "個故事站",
+    linksStat: "條地下通道",
+    claim: "先聽故事",
+    meaning: "為什麼有料",
+    evidence: "真實現場",
+    caution: "別被帶偏",
+    connections: "下一站",
+    sources: "繼續挖寶",
+    accessibleSelect: "快速跳站",
+    selectNode: "想去哪一站？",
+    level: "層級",
+    era: "年代",
+    cluster: "群集",
+    reset: "重設視角",
+    zoomIn: "放大",
+    zoomOut: "縮小",
+    openDomains: "開啟領域",
+    close: "關閉",
+    dark: "暗色",
+    light: "亮色",
+    foundation: "起手式",
+    core: "進主歌",
+    advanced: "深水區",
+    incoming: "這站從哪來",
+    outgoing: "接著往哪去",
+    emptySearch: "這條線暫時沒車；換個人名、城市、聲音或英文再搜一次。",
+  },
+  en: {
+    kicker: "BORN IN THE BRONX · BUILT FOR THE WORLD",
+    title: "Hip-Hop Histories",
+    search: "Find a DJ, crew, city, sound, or a story worth digging…",
+    searchHint: "Press / to dig",
+    domains: "Which line are you taking?",
+    domainsSub: "18 lines · 216 story stops",
+    graphTitle: "Put the record on: every dot carries a real street story",
+    graphSub: "Drag the vinyl, roll in close, or change subway lines. Every link says something: who influenced whom, how sound traveled, and who flipped the rules.",
+    visible: "Live now",
+    nodes: "stops",
+    playing: "NOW SPINNING",
+    timeline: "Ride through time",
+    timelineSub: "Click again for the whole line",
+    relations: "Show this link only",
+    all: "All",
+    selectPrompt: "Pick any dot and let it tell the whole story",
+    selectBody: "No date-memorizing test here. Each stop starts with people, places, and sound—then shows why it hits, what really happened, and which legend deserves a second look.",
+    domainsStat: "lines",
+    nodesStat: "story stops",
+    linksStat: "underground passages",
+    claim: "Story first",
+    meaning: "Why it hits",
+    evidence: "Real-world scene",
+    caution: "Don’t get it twisted",
+    connections: "Next stop",
+    sources: "Keep digging",
+    accessibleSelect: "Jump to a stop",
+    selectNode: "Where are you headed?",
+    level: "Level",
+    era: "Era",
+    cluster: "Cluster",
+    reset: "Reset view",
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    openDomains: "Open domains",
+    close: "Close",
+    dark: "Dark",
+    light: "Light",
+    foundation: "First steps",
+    core: "In the pocket",
+    advanced: "Deep cut",
+    incoming: "Where this came from",
+    outgoing: "Where it goes next",
+    emptySearch: "No train on this line. Try another name, city, sound, or language.",
+  },
+};
+
+const ERAS = [
+  { id: "antecedents", short: "<73", zh: "1973 前史", en: "Before 1973" },
+  { id: "formation", short: "73–78", zh: "1973–78 形成", en: "1973–78 Formation" },
+  { id: "recording", short: "79–84", zh: "1979–84 錄音化", en: "1979–84 Recording" },
+  { id: "diversification", short: "85–92", zh: "1985–92 多元化", en: "1985–92 Diversification" },
+  { id: "regional", short: "93–99", zh: "1993–99 區域化", en: "1993–99 Regionalization" },
+  { id: "digital", short: "00–09", zh: "2000–09 數位轉向", en: "2000–09 Digital turn" },
+  { id: "platform", short: "10–19", zh: "2010–19 平台化", en: "2010–19 Platforms" },
+  { id: "memory", short: "20+", zh: "2020s 記憶與未來", en: "2020s Memory & futures" },
+];
+
+const RELATION_TYPES = {
+  precedes: { zh: "時間先於", en: "Precedes" },
+  influences: { zh: "影響", en: "Influences" },
+  adapts: { zh: "轉化", en: "Adapts" },
+  responds: { zh: "回應／反駁", en: "Responds / contests" },
+  enables: { zh: "技術促成", en: "Technically enables" },
+  circulates: { zh: "媒介流通", en: "Circulates through" },
+  commercializes: { zh: "商業化", en: "Commercializes" },
+  regulates: { zh: "法律規範", en: "Regulates" },
+  localizes: { zh: "在地化", en: "Localizes" },
+  documents: { zh: "檔案記錄", en: "Documents" },
+  canonizes: { zh: "經典化", en: "Canonizes" },
+  marginalizes: { zh: "邊緣化", en: "Marginalizes" },
+  revives: { zh: "復興／再發現", en: "Revives" },
+  frames: { zh: "形塑身份", en: "Frames identity" },
+  institutionalizes: { zh: "制度化", en: "Institutionalizes" },
+  samples: { zh: "採樣／重組", en: "Samples / recomposes" },
+};
+
+const SOURCES = {
+  nmaahcBronx: { title: "Hip-Hop in the Bronx", publisher: "Smithsonian NMAAHC", url: "https://nmaahc.si.edu/explore/stories/hip-hop-bronx" },
+  nmaahcWomen: { title: "Fashioning Power and Gender in Hip-Hop", publisher: "Smithsonian NMAAHC", url: "https://nmaahc.si.edu/explore/stories/women-hip-hop" },
+  nmaahcTech: { title: "Five Things to See: The Technology of Hip-Hop", publisher: "Smithsonian NMAAHC", url: "https://nmaahc.si.edu/explore/stories/five-things-see-technology-hip-hop" },
+  smithsonian: { title: "Smithsonian Anthology of Hip-Hop and Rap", publisher: "Smithsonian Folkways", url: "https://folkways.si.edu/smithsonian-anthology-of-hip-hop-and-rap-intl" },
+  cornell: { title: "Hip Hop Collection", publisher: "Cornell University Library", url: "https://rmc.library.cornell.edu/hiphop/collections.php" },
+  conzo: { title: "Joe Conzo Jr. Archive", publisher: "Cornell University Library", url: "https://rmc.library.cornell.edu/hiphop/conzo.php/digital_collections.php" },
+  loc: { title: "Rapper’s Delight and the National Recording Registry", publisher: "Library of Congress", url: "https://www.loc.gov/news/2012/12-107.html" },
+  cambridge: { title: "The Cambridge Companion to Hip-Hop", publisher: "Cambridge University Press", url: "https://doi.org/10.1017/CCO9781139775298" },
+  globalRap: { title: "The Cambridge Companion to Global Rap", publisher: "Cambridge University Press", url: "https://assets.cambridge.org/97813165/15266/excerpt/9781316515266_excerpt.pdf" },
+  keyes: { title: "Rap Music and Street Consciousness", publisher: "University of Illinois Press", url: "https://www.press.uillinois.edu/books/?id=p072017" },
+  rose: { title: "Black Noise", publisher: "Wesleyan University Press", url: "https://www.weslpress.org/9780819562753/black-noise/" },
+  schloss: { title: "Making Beats", publisher: "Wesleyan University Press", url: "https://www.weslpress.org/9780819574817/making-beats/" },
+  south: { title: "Chronicling Stankonia", publisher: "University of North Carolina Press", url: "https://uncpress.org/book/9781469661964/chronicling-stankonia" },
+  cuba: { title: "Buena Vista in the Club", publisher: "Duke University Press", url: "https://www.dukeupress.edu/buena-vista-in-the-club" },
+  taiwan: { title: "Renegade Rhymes", publisher: "University of Chicago Press", url: "https://doi.org/10.7208/chicago/9780226820583.001.0001" },
+  china: { title: "Television and the Janus Face of Chinese Hip-Hop", publisher: "Cambridge University Press", url: "https://doi.org/10.1017/9781009099738.019" },
+  copyright: { title: "Sampling, Interpolations, Beat Stores and More", publisher: "U.S. Copyright Office", url: "https://www.copyright.gov/music-modernization/educational-materials/Sampling-Interpolations-Beat-Stores-and-More-An-Introduction-for-Musicians-Using-Preexisting.pdf" },
+};
+
+const D = (id, code, color, zh, en, subtitleZh, subtitleEn, clusters, evidenceZh, evidenceEn, cautionZh, cautionEn, sourceIds, topics) => ({
+  id, code, color, title: { zh, en }, subtitle: { zh: subtitleZh, en: subtitleEn }, clusters, evidence: { zh: evidenceZh, en: evidenceEn }, caution: { zh: cautionZh, en: cautionEn }, sourceIds, topics,
+});
+
+const T = (zh, en, era, cluster, level, noteZh, noteEn) => ({ zh, en, era, cluster, level, note: { zh: noteZh, en: noteEn } });
+
+const DOMAINS = [
+  D("historiography", "01", "#ff5b3a", "誰寫下嘻哈史？", "Who gets to write hip-hop history?", "從史料而非神話建立歷史", "Build history from evidence rather than myth",
+    [["史料判讀","Reading sources"],["口述與記憶","Oral history & memory"],["經典與紀念","Canon & commemoration"],["倫理與方法","Ethics & method"]],
+    "傳單、照片、錄音 metadata、同期報導與口述史之間的交叉比對", "triangulation among flyers, photographs, recording metadata, period journalism, and oral histories",
+    "後來的回憶、官方紀念與產業經典都具有立場，不能直接等同當時全貌", "retrospective memory, official commemoration, and industry canons all have standpoints and are not the whole past",
+    ["cornell","conzo","smithsonian","loc"], [
+      T("一手與二手史料","Primary and secondary sources",0,0,"foundation","先辨認材料形成的時間、作者、目的與受眾。","Identify when, by whom, for whom, and why a source was made."),
+      T("派對傳單作為事件證據","Party flyers as event evidence",1,0,"foundation","場地、票價、藝名與電話能重建早期活動網絡。","Venues, prices, names, and phone numbers help reconstruct early event networks."),
+      T("攝影的取景與缺席","Photographic framing and absence",1,0,"core","照片保存現場，也受攝影者位置、選片與權利限制。","Photographs preserve scenes while reflecting position, selection, and rights constraints."),
+      T("口述史與回溯記憶","Oral history and retrospective memory",7,1,"core","親歷者提供無可取代的細節，但時間會重組記憶。","Participants offer irreplaceable detail, yet time reorganizes memory."),
+      T("錄音與館藏 metadata","Recording and collection metadata",2,1,"foundation","日期、廠牌、製作與入藏資訊可驗證流通脈絡。","Dates, labels, credits, and accession data help verify circulation."),
+      T("同期媒體與道德恐慌","Period media and moral panic",3,1,"core","新聞既記錄事件，也可能放大犯罪、危險或世代衝突。","Journalism records events but may amplify crime, danger, or generational conflict."),
+      T("1973：為什麼把這天當生日？","1973: Why call this hip-hop’s birthday?",1,2,"core","8 月 11 日是重要公共紀念，不等於所有元素同夜完成。","August 11 is a key public commemoration, not a claim that every element appeared that night."),
+      T("排行榜、獎項與典藏經典","Charts, awards, and archival canons",7,2,"advanced","被保存或得獎代表制度選擇，不必然等於文化上的唯一重要性。","Preservation and awards reflect institutional choice, not exclusive cultural importance."),
+      T("檔案沉默與保存偏差","Archival silence and survival bias",7,2,"advanced","未被保存的女性、地方場景與非商業活動需要由旁證重建。","Women, local scenes, and noncommercial events missing from archives require indirect reconstruction."),
+      T("爭議人物與歷史責任","Contested figures and historical accountability",7,3,"advanced","貢獻、權力與傷害必須分層說明，不能以經典地位免除檢視。","Contribution, power, and harm must be separated; canonical status does not remove accountability."),
+      T("保存、近用與著作權","Preservation, access, and copyright",7,3,"core","metadata 開放不代表照片、錄音與掃描件都可自由重製。","Open metadata does not mean every photo, recording, or scan is freely reusable."),
+      T("多重嘻哈史","Plural hip-hop histories",7,3,"advanced","以多地點、多實踐與多社群網絡取代單線英雄史。","Replace a single heroic line with networks of places, practices, and communities."),
+  ]),
+
+  D("black-continuities", "02", "#f6a93b", "麥克風以前的聲音", "The sounds before the microphone", "語言、節奏、舞蹈與公共發聲的長期資源", "Long-term resources of language, rhythm, dance, and public address",
+    [["口述互動","Oral interaction"],["節奏與 break","Rhythm & breaks"],["語言與敘事","Language & narrative"],["政治與社群","Politics & community"]],
+    "不同年代的表演錄音、語言形式、節奏結構與社群功能", "performance recordings, linguistic forms, rhythmic structures, and community functions across periods",
+    "文化連續性不應被畫成從非洲到 rap 的單一路徑或未改變的本質", "cultural continuity should not become a single unchanged line from Africa to rap",
+    ["keyes","rose","cambridge","smithsonian"], [
+      T("呼應式互動","Call-and-response",0,0,"foundation","表演者與群眾共同製造節奏、權威與參與感。","Performer and crowd co-produce rhythm, authority, and participation."),
+      T("炫技、戲謔與 signifying","Boasting, play, and signifying",0,0,"core","語意雙關、模仿與競逐讓語言本身成為表演。","Double meaning, imitation, and contest make language itself performative."),
+      T("toasts、dozens 與街頭敘事","Toasts, dozens, and street narratives",0,0,"core","長篇口述、互罵遊戲與人物故事提供可比較的修辭資源。","Extended tales, verbal contests, and character stories offer comparable rhetorical resources."),
+      T("電台 DJ 的節奏化話語","Rhythmic radio-DJ speech",0,1,"core","播音員的押韻口播與人格化主持先於 rap 錄音工業。","Rhymed patter and on-air personae predate the rap recording industry."),
+      T("spoken word 與黑人藝術運動","Spoken word and the Black Arts Movement",0,1,"core","詩、爵士與政治發聲形成重要近代參照。","Poetry, jazz, and political address form a crucial modern reference."),
+      T("funk break 與 James Brown 美學","Funk breaks and James Brown aesthetics",0,1,"foundation","鼓、貝斯與切分節奏的片段成為舞者與 DJ 的核心材料。","Drum, bass, and syncopated passages became key material for dancers and DJs."),
+      T("pocket、切分與重拍","Pocket, syncopation, and the one",0,2,"core","嘻哈節奏感不只是 BPM，而是重音與微小時間差的組織。","Hip-hop feel is not only BPM but an organization of accents and microtiming."),
+      T("靈魂、福音、藍調的再脈絡化","Recontextualizing soul, gospel, and blues",3,2,"core","舊錄音被引用時會同時帶入聲音質地與集體記憶。","Reused recordings carry both sonic texture and collective memory."),
+      T("押韻人格與第一人稱敘事","Rhyme persona and first-person narrative",2,2,"core","第一人稱可能是作者、角色、誇飾或社群代言的混合。","The first person may mix author, character, exaggeration, and community voice."),
+      T("社會評論與見證","Social commentary and witnessing",2,3,"core","rap 能記錄生活條件，也會以藝術形式選擇與壓縮事件。","Rap can witness conditions while artistically selecting and compressing events."),
+      T("disco、funk 與舞池連續帶","The disco–funk dance-floor continuum",1,3,"advanced","早期嘻哈與 disco 既競爭也共享場地、器材與舞曲文化。","Early hip-hop contested disco while sharing venues, equipment, and dance culture."),
+      T("連續性不是單一起源","Continuity is not singular origin",7,3,"advanced","相似形式要以歷史接觸與具體轉化證明，不能只靠表面類比。","Similar forms require evidence of contact and transformation, not surface analogy alone."),
+  ]),
+
+  D("caribbean", "03", "#e5d14a", "牙買加喇叭怎麼進了紐約？", "How Jamaican speakers reached New York", "移民、音響、toasting 與跨島嶼流通", "Migration, amplification, toasting, and trans-island circulation",
+    [["sound system","Sound systems"],["DJ 與聲音空間","DJ & sonic space"],["移民與布朗克斯","Migration & the Bronx"],["混合與辨證","Hybridity & interpretation"]],
+    "牙買加聲音系統史、移民經驗、早期 DJ 訪談與布朗克斯活動紀錄", "Jamaican sound-system history, migration experience, early-DJ interviews, and Bronx event records",
+    "加勒比影響極其重要，但不能抹除非裔美國人與波多黎各／拉丁裔參與者的共同創造", "Caribbean influence is crucial but must not erase African American and Puerto Rican/Latino co-creation",
+    ["keyes","cambridge","globalRap","nmaahcBronx"], [
+      T("牙買加 sound system","Jamaican sound systems",0,0,"foundation","移動式擴音、selector、deejay 與社區舞會構成完整生態。","Mobile amplification, selector, deejay, and community dances formed an ecosystem."),
+      T("selector 與 deejay 的分工","Selector and deejay roles",0,0,"core","選曲與話語表演可由不同角色合作完成。","Record selection and vocal address may be divided between collaborators."),
+      T("toasting 與麥克風互動","Toasting and microphone interaction",0,0,"core","節奏化口語在版本音軌上建立即時社群關係。","Rhythmic speech over versions builds immediate communal relations."),
+      T("dub、version 與空間化混音","Dub, versions, and spatial mixing",0,1,"advanced","去除、回聲與重組使錄音室成為作曲工具。","Subtraction, echo, and recombination turn the studio into a compositional tool."),
+      T("sound clash 與競爭聆聽","Sound clash and competitive listening",0,1,"core","音量、選曲、稀有錄音與現場反應共同決定聲望。","Volume, selection, rare records, and crowd response jointly establish reputation."),
+      T("移動式擴音的公共空間","Mobile amplification in public space",0,1,"foundation","聲音系統把技術、空間控制與社群聚集連在一起。","Sound systems link technology, spatial control, and community gathering."),
+      T("加勒比移民與紐約網絡","Caribbean migration and New York networks",0,2,"core","跨國家庭、唱片與派對把島嶼聲音帶進多族裔城市。","Transnational families, records, and parties brought island sounds into a multiethnic city."),
+      T("Kool Herc 的牙買加經驗","Kool Herc’s Jamaican experience",1,2,"core","其背景是理解早期音響與 break 實踐的線索，而非唯一原因。","His background helps explain early sound and break practices without becoming a sole cause."),
+      T("reggae、disco 與 funk 的共存","Reggae, disco, and funk in coexistence",1,2,"advanced","移民音樂選擇會因布朗克斯舞池反應而重新調整。","Migrant musical choices were recalibrated through Bronx dance-floor response."),
+      T("波多黎各與加勒比青年網絡","Puerto Rican and Caribbean youth networks",1,3,"core","舞蹈、派對、視覺文化與街區關係跨越簡單族群分類。","Dance, parties, visual culture, and neighborhood ties crossed simple ethnic categories."),
+      T("離散媒介循環","Diasporic media circulation",5,3,"advanced","唱片、磁帶、廣播、巡演與網路讓聲音反覆往返，而非單向輸出。","Records, tapes, radio, tours, and networks produce repeated return rather than one-way export."),
+      T("影響不等於直系血統","Influence is not direct descent",7,3,"advanced","關係必須標記為交流、改造或共同條件，而不是神話式家譜。","Relations should specify exchange, adaptation, or shared conditions rather than mythic genealogy."),
+  ]),
+
+  D("bronx", "04", "#69c967", "布朗克斯：裂縫裡的舞台", "The Bronx: a stage in the cracks", "城市政策、空間與創造力的交織", "Urban policy, space, and creativity intertwined",
+    [["人口與城市政策","Population & policy"],["危機與公共服務","Crisis & public services"],["青年空間","Youth spaces"],["社群與身份","Community & identity"]],
+    "人口資料、都市計畫、住宅史、地方新聞、照片與居民口述的並置", "population data, planning records, housing history, local news, photographs, and resident testimony",
+    "不能用『布朗克斯燃燒』的災難圖像抹除家庭、社群組織與日常創造力", "the disaster image of a 'burning Bronx' must not erase families, community organization, and everyday creativity",
+    ["nmaahcBronx","cornell","conzo","rose"], [
+      T("戰後移民與多族裔布朗克斯","Postwar migration and a multiethnic Bronx",0,0,"foundation","黑人、波多黎各裔與加勒比移民在不同時段重塑街區。","Black, Puerto Rican, and Caribbean migration reshaped neighborhoods over time."),
+      T("Cross Bronx Expressway 與都市更新","The Cross Bronx Expressway and urban renewal",0,0,"core","高速道路與拆遷改變居住、商業與社群連續性。","Highway construction and clearance altered residence, commerce, and community continuity."),
+      T("redlining、撤資與住宅不平等","Redlining, disinvestment, and housing inequality",0,0,"core","金融與政策結構限制維修、投資與遷移選擇。","Financial and policy structures constrained repair, investment, and mobility choices."),
+      T("火災、棄置與簡化敘事","Fires, abandonment, and simplified narratives",0,1,"advanced","火災有多種原因，不能全部化約為居民犯罪。","Fires had multiple causes and cannot be reduced to resident criminality."),
+      T("財政危機與公共服務","Fiscal crisis and public services",1,1,"core","市政縮減影響消防、學校、青年方案與公共空間。","Municipal contraction affected fire services, schools, youth programs, and public space."),
+      T("住宅大樓 community room","Housing-project community rooms",1,1,"foundation","住宅公共空間為低成本派對與社群組織提供場地。","Shared residential spaces enabled low-cost parties and community organization."),
+      T("公園、操場與街道","Parks, playgrounds, and streets",1,2,"foundation","非正式公共空間成為舞蹈、音響與觀看的基礎設施。","Informal public spaces became infrastructure for dance, sound, and spectatorship."),
+      T("gang、crew 與歸屬網絡","Gangs, crews, and networks of belonging",1,2,"core","青年組織可能涉及衝突，也提供保護、身份與轉化路徑。","Youth formations could involve conflict while offering protection, identity, and routes of transformation."),
+      T("學校、藝術資源與非正式學習","Schools, arts resources, and informal learning",1,2,"core","正式資源的不均與同儕傳授共同塑造技能取得。","Uneven formal resources and peer teaching jointly shaped access to skills."),
+      T("黑人與波多黎各青年共創","Black and Puerto Rican youth co-creation",1,3,"core","合作、競爭與記憶政治必須同時呈現，不能把任何群體裝飾化。","Collaboration, competition, and memory politics must appear without tokenizing any group."),
+      T("街區代表與地方自豪","Representing the neighborhood",2,3,"core","地名、口音與 crew 身份把地方經驗轉為文化權威。","Place names, accents, and crew identities turn local experience into cultural authority."),
+      T("限制中的創造力，不是苦難浪漫化","Creativity under constraint, not romanticized suffering",7,3,"advanced","結構壓迫解釋條件，卻不應被描述成藝術必需的燃料。","Structural oppression explains conditions but should not be framed as art’s necessary fuel."),
+  ]),
+
+  D("early-scenes", "05", "#38c7a5", "派對、DJ 與最早的 crew", "Parties, DJs, and the first crews", "從現場活動到文化網絡的形成", "From live events to a cultural network",
+    [["事件與場所","Events & venues"],["DJ 技術","DJ technique"],["MC 與 crew","MCs & crews"],["流通與神話","Circulation & myth"]],
+    "派對傳單、場地地圖、器材證詞、DJ／MC 訪談與同期錄音", "party flyers, venue maps, equipment testimony, DJ/MC interviews, and period recordings",
+    "『第一個』常是後來的榮譽競逐；應區分可確證日期、技術貢獻與社群記憶", "'first' claims are often retrospective contests; distinguish documented dates, technical contributions, and community memory",
+    ["cornell","conzo","nmaahcBronx","smithsonian"], [
+      T("Cindy Campbell 的返校派對","Cindy Campbell’s back-to-school party",1,0,"foundation","派對的組織與經濟目的提醒我們女性與幕後勞動的重要性。","The party’s organization and economic purpose foreground women and behind-the-scenes labor."),
+      T("1520 Sedgwick Avenue","1520 Sedgwick Avenue",1,0,"foundation","住宅大樓公共室成為廣泛承認的紀念地標。","A residential community room became a widely recognized commemorative landmark."),
+      T("街區派對與戶外 jam","Block parties and outdoor jams",1,0,"core","現場聲音、電力、天候、警務與鄰里關係共同決定活動。","Sound, electricity, weather, policing, and neighborhood relations jointly shaped events."),
+      T("擴音、喇叭與音量權力","Amplification, speakers, and volume power",1,1,"core","器材能力決定可覆蓋的空間、身體感與 DJ 聲望。","Equipment capacity shaped spatial reach, bodily impact, and DJ reputation."),
+      T("Kool Herc 的 merry-go-round","Kool Herc’s merry-go-round",1,1,"core","在兩張唱片間延長 break，重組舞者最在意的時間。","Extending breaks across two records reorganized the time dancers valued most."),
+      T("Grandmaster Flash 的 quick-mix 與 cueing","Grandmaster Flash’s quick-mix and cueing",1,1,"advanced","可重複定位 break 提升混音精度與表演控制。","Repeatable break location increased mixing precision and performance control."),
+      T("scratching 的發明敘事","Narratives of scratching’s invention",1,2,"advanced","Grand Wizzard Theodore 的貢獻重要，也需區分技術發現、命名與普及。","Grand Wizzard Theodore’s contribution matters while discovery, naming, and diffusion remain distinct."),
+      T("MC 作為 party rocker","The MC as party rocker",1,2,"foundation","早期 MC 首先管理氣氛、介紹 DJ、帶動群眾與 crew。","Early MCs managed atmosphere, introduced DJs, moved crowds, and represented crews."),
+      T("crew、領地與活動巡迴","Crews, territory, and event circuits",1,2,"core","聲望由跨街區表演、合作、競爭與口耳相傳累積。","Reputation accumulated through cross-neighborhood performance, collaboration, rivalry, and word of mouth."),
+      T("傳單、promoter 與電話網絡","Flyers, promoters, and phone networks",1,3,"core","平面設計與聯絡資訊是早期場景的媒介基礎設施。","Graphic design and contact details were media infrastructure for the early scene."),
+      T("俱樂部與跨區域擴張","Clubs and cross-borough expansion",2,3,"core","由社區空間進入俱樂部改變受眾、收入、安保與演出格式。","Moving from community spaces to clubs changed audiences, revenue, security, and format."),
+      T("1977 blackout 神話的查證","Testing the 1977 blackout myth",1,3,"advanced","停電後器材增加的故事流傳甚廣，但因果與規模需要史料支持。","Stories of equipment acquisition after the blackout are widespread, but scale and causality require evidence."),
+  ]),
+
+  D("mcing", "06", "#3ab8df", "MC 怎麼把話踩進拍子", "How MCs step words into the beat", "聲音如何組織節奏、敘事、身份與競逐", "How voice organizes rhythm, narrative, identity, and contest",
+    [["主持與互動","Hosting & interaction"],["節奏與押韻","Rhythm & rhyme"],["敘事與人格","Narrative & persona"],["battle 與語言政治","Battle & language politics"]],
+    "現場錄音、歌詞轉寫、節奏分析、語言學比較與表演情境", "live recordings, lyric transcription, rhythmic analysis, linguistic comparison, and performance context",
+    "歌詞中的第一人稱不必然是作者自傳；flow 也不能只用紙上歌詞判斷", "first-person lyrics are not necessarily autobiography, and flow cannot be inferred from text alone",
+    ["cambridge","keyes","rose","globalRap"], [
+      T("MC 作為主持者","MC as host",1,0,"foundation","介紹、呼喊與控制現場先於錄音明星式 rapper。","Introductions, shout-outs, and crowd control precede the recorded rap star."),
+      T("routine、接句與群眾回應","Routines, trade-offs, and crowd response",1,0,"core","多人 MC 以固定段落、接句和口號建立集體聲音。","Multiple MCs use routines, trade-offs, and slogans to build a collective voice."),
+      T("cadence 與 flow","Cadence and flow",2,0,"core","重音、音節密度、停頓與拍點關係塑造 flow。","Accent, syllable density, pause, and beat placement shape flow."),
+      T("bar、拍號與句法錯位","Bars, meter, and syntactic displacement",2,1,"advanced","語句可跨越小節，使語法和音樂邊界互相拉扯。","Phrases may cross bar lines, creating tension between syntax and meter."),
+      T("內韻、多音節韻與韻網","Internal, multisyllabic, and rhyme networks",3,1,"advanced","押韻可在句內形成密集回聲，不只停在行末。","Rhyme can create dense internal echoes rather than merely end lines."),
+      T("呼吸、發聲與麥克風控制","Breath, delivery, and microphone control",2,1,"core","音色、音量、咬字與呼吸安排共同構成可聽見的技術。","Timbre, volume, articulation, and breath jointly form audible technique."),
+      T("storytelling rap","Storytelling rap",2,2,"core","角色、場景、時間與視角讓歌曲組織虛構或見證。","Character, scene, time, and viewpoint organize fiction or testimony."),
+      T("persona、mask 與作者","Persona, mask, and author",3,2,"advanced","藝名與敘事聲音在真實人物和表演角色之間移動。","Stage names and narrative voices move between person and performed character."),
+      T("braggadocio 與 battle","Braggadocio and battle",1,2,"core","誇飾是競技修辭，也可能再製權力與排除。","Boasting is competitive rhetoric that can also reproduce power and exclusion."),
+      T("freestyle 的多重定義","Multiple meanings of freestyle",3,3,"advanced","freestyle 可指即興、未限定主題或預寫段落，必須標明情境。","Freestyle may mean improvised, topic-free, or prewritten material depending on context."),
+      T("多語、方言與 code-switching","Multilingualism, dialect, and code-switching",6,3,"core","語言選擇把地方身份、社群邊界與全球參照放進 flow。","Language choice places local identity, community boundaries, and global reference inside flow."),
+      T("歌詞不是透明自傳","Lyrics are not transparent autobiography",7,3,"advanced","研究者必須區分角色、類型慣例、商業定位與生活證據。","Researchers must distinguish persona, genre convention, marketing, and life evidence."),
+  ]),
+
+  D("dj-beats", "07", "#5b83e7", "唱盤、scratch 與 beatmaker", "Turntables, scratches, and beatmakers", "從選曲、混音到製作人知識", "From selection and mixing to producer knowledge",
+    [["唱盤基礎","Turntable foundations"],["表演技術","Performance techniques"],["turntablism","Turntablism"],["製作人知識","Producer knowledge"]],
+    "器材示範、現場錄音、製作訪談、操作流程與聲音分析", "equipment demonstrations, live recordings, producer interviews, workflows, and sonic analysis",
+    "技術史不能只列器材上市年份；取得成本、地方用法與實踐知識同樣重要", "technology history is more than release dates; cost, local use, and practical knowledge matter",
+    ["schloss","nmaahcTech","cambridge","smithsonian"], [
+      T("雙唱盤與 mixer","Two turntables and a mixer",1,0,"foundation","兩個聲源與中央混音器讓 DJ 可接續、切換與重組時間。","Two sources and a central mixer let DJs continue, switch, and reorganize time."),
+      T("break 選擇與舞池知識","Break selection and dance-floor knowledge",1,0,"foundation","選擇哪個片段依賴唱片記憶與對舞者反應的觀察。","Choosing a passage depends on record memory and observation of dancers."),
+      T("cueing、耳機與標記","Cueing, headphones, and marking",1,0,"core","預聽與視覺標記把瞬間反應變成可重複技術。","Previewing and visual marks turn instant response into repeatable technique."),
+      T("backspinning 與 break 延長","Backspinning and break extension",1,1,"core","回轉唱片並交替播放，使短片段成為長時間結構。","Rewinding and alternating records turns a short passage into extended form."),
+      T("scratching 的聲音語彙","The sonic vocabulary of scratching",2,1,"core","唱片移動、crossfader 與節奏手勢產生可辨識音型。","Record motion, crossfader control, and rhythmic gesture create recognizable figures."),
+      T("cutting、transform 與 chirp","Cutting, transform, and chirp techniques",3,1,"advanced","不同手勢組合把唱盤當成發音與節奏樂器。","Gesture combinations treat the turntable as an articulating rhythmic instrument."),
+      T("beat juggling","Beat juggling",3,2,"advanced","兩張唱片的鼓點被重新排序成新的節奏句法。","Drum hits across two records are reordered into new rhythmic syntax."),
+      T("turntablism battle 與團隊編曲","Turntablist battles and ensemble arranging",4,2,"advanced","競賽把精度、原創性與多人協作制度化。","Competition institutionalizes precision, originality, and ensemble coordination."),
+      T("crate digging 作為知識實踐","Crate digging as knowledge practice",3,2,"core","找唱片包含分類、記憶、秘密與社群倫理。","Record seeking involves classification, memory, secrecy, and community ethics."),
+      T("DJ 與 producer 角色分化","The DJ–producer role split",3,3,"core","錄音工業使現場選曲者與錄音室作曲者部分分離。","The recording industry partially separated live selectors from studio composers."),
+      T("現場 set 與錄音室 beat","Live sets and studio beats",3,3,"core","即時回應群眾與可反覆編輯的作品具有不同時間邏輯。","Crowd-responsive performance and revisable studio work follow different temporal logics."),
+      T("技術、品味與作者性","Technology, taste, and authorship",7,3,"advanced","製作人的作者性同時來自操作能力、選擇判斷與文化知識。","Producer authorship combines operational skill, selective judgment, and cultural knowledge."),
+  ]),
+
+  D("breaking", "08", "#8b69dc", "Breaking：身體在回嘴", "Breaking: when the body talks back", "舞者如何讓 break 成為身體、社群與競技", "How dancers turn the break into body, community, and contest",
+    [["歷史與術語","History & terms"],["動作語彙","Movement vocabulary"],["音樂性與競技","Musicality & contest"],["傳承與制度","Transmission & institutions"]],
+    "舞者口述、現場影像、動作分析、crew 歷史與比賽規則", "dancer testimony, live footage, movement analysis, crew history, and competition rules",
+    "媒體常用的 breakdancing 不能涵蓋社群對 breaking、b-boy 與 b-girl 的自我命名", "the media term breakdancing does not fully capture community terms such as breaking, b-boy, and b-girl",
+    ["cambridge","smithsonian","cornell","globalRap"], [
+      T("break 作為舞蹈時機","The break as dance opportunity",1,0,"foundation","DJ 延長器樂 break，使舞者獲得展示與回應的時間。","Extended instrumental breaks give dancers time to display and respond."),
+      T("b-boy、b-girl 與命名政治","B-boy, b-girl, and naming politics",1,0,"core","名稱標記社群身份，也會在媒體與制度中被重新定義。","Names mark community identity and are redefined by media and institutions."),
+      T("toprock 與進場","Toprock and entry",1,0,"foundation","站立步法建立節奏、姿態與進入地面的轉折。","Standing steps establish rhythm, attitude, and transition to the floor."),
+      T("footwork／downrock","Footwork / downrock",1,1,"core","手腳支撐與環形路徑組成具個人風格的地板語彙。","Hand-foot support and circular pathways form individualized floor vocabulary."),
+      T("freeze 與節奏標點","Freezes as rhythmic punctuation",1,1,"core","突然停止用身體標記音樂重音、結尾或挑釁。","Sudden stillness bodily marks accents, endings, or challenges."),
+      T("power moves 與體能技術","Power moves and physical technique",3,1,"advanced","旋轉與拋接需要力量，也依賴動量、表面與風險管理。","Rotations require strength alongside momentum, surface awareness, and risk management."),
+      T("musicality 與 break 解讀","Musicality and reading the break",3,2,"advanced","高難度不等於音樂性；動作須回應聲音結構與意外。","Difficulty is not musicality; movement must answer sonic structure and surprise."),
+      T("cypher 的圓圈秩序","The social order of the cypher",1,2,"core","圓圈同時提供舞台、觀眾、進出規則與即時評價。","The circle provides stage, audience, entry rules, and immediate evaluation."),
+      T("battle 與勝負判準","Battles and criteria of judgment",1,2,"core","原創、音樂性、回應與失誤在不同場景有不同權重。","Originality, musicality, response, and mistakes carry different weights across scenes."),
+      T("crew、傳承與地方 style","Crews, lineage, and local style",2,3,"core","同儕教學與 crew 身份保存招式，也鼓勵變體。","Peer teaching and crew identity preserve moves while encouraging variation."),
+      T("影像、巡演與全球傳播","Video, touring, and global transmission",4,3,"core","電影、錄影帶與比賽讓動作跨境，同時改變學習方式。","Film, videotape, and competition move styles across borders while changing pedagogy."),
+      T("Breaking 的制度化與奧運化","Institutionalization and Olympification of breaking",7,3,"advanced","競賽制度增加能見度，也重新規範命名、評分與代表權。","Formal competition increases visibility while regulating naming, scoring, and representation."),
+  ]),
+
+  D("visual-culture", "09", "#c260d0", "塗鴉、傳單、球鞋與造型", "Graffiti, flyers, sneakers, and style", "看得見的嘻哈如何製造身份與空間", "How visible hip-hop makes identity and space",
+    [["writing 與城市表面","Writing & urban surfaces"],["文件與設計","Documents & design"],["服裝與身體","Dress & body"],["媒體與商品","Media & commodity"]],
+    "照片、作品位置、傳單原稿、服裝物件、設計署名與展覽脈絡", "photographs, work locations, flyer originals, garments, design credits, and exhibition context",
+    "graffiti 與 rap 並非在所有時地都屬同一場景；四元素框架是歷史建構而非自然法則", "graffiti and rap did not share one scene everywhere; the four-element framework is historical, not natural law",
+    ["cornell","conzo","nmaahcWomen","smithsonian"], [
+      T("tag、署名與城市可見性","Tags, names, and urban visibility",0,0,"foundation","重複署名把移動路徑、名聲與被忽視者的可見性連起來。","Repeated names link routes, reputation, and visibility for the overlooked."),
+      T("地鐵列車作為移動表面","Subway trains as moving surfaces",1,0,"core","列車讓作品跨區流通，也引發城市治理與清除政策。","Trains carried work across boroughs and prompted governance and removal campaigns."),
+      T("style writing、piece 與技術判準","Style writing, pieces, and technical criteria",1,0,"core","字體結構、填色、輪廓與位置形成社群內部評價。","Letter structure, fill, outline, and placement form internal standards."),
+      T("crew、領域與合作製作","Crews, territory, and collaborative production",1,1,"core","大型作品需要分工，也在空間競逐中標記歸屬。","Large works require collaboration and mark affiliation within spatial contests."),
+      T("攝影如何保存並改變場景","How photography preserves and changes scenes",2,1,"advanced","影像使短暫作品進入出版、博物館與全球想像。","Images move ephemeral work into publication, museums, and global imagination."),
+      T("派對傳單的字體與資訊設計","Typography and information design in party flyers",1,1,"core","手繪字、人物排序與場地資訊共同生產事件聲望。","Hand lettering, billing order, and venue information co-produce event prestige."),
+      T("街頭到藝廊的跨界","From street to gallery",2,2,"advanced","藝廊增加保存與市場，也會改變作者、所有權與觀眾關係。","Gallery entry expands preservation and markets while altering authorship, ownership, and audience."),
+      T("運動服、球鞋與街區風格","Tracksuits, sneakers, and neighborhood style",2,2,"foundation","服裝兼具活動性、品牌意義、階級訊號與地方差異。","Dress combines mobility, brand meaning, class signals, and local difference."),
+      T("珠寶、奢華與成功展示","Jewelry, luxury, and displaying success",3,2,"core","炫耀可回應匱乏與排除，也可能強化消費階序。","Display can answer deprivation and exclusion while reinforcing consumer hierarchy."),
+      T("女性風格與尊重政治","Women’s style and politics of respect",3,3,"core","服裝在專業權威、性別期待、保護與自我表達間協商。","Dress negotiates authority, gender expectation, safety, and self-expression."),
+      T("專輯封面、MV 與視覺敘事","Album covers, videos, and visual narrative",3,3,"core","聲音形象透過攝影、剪輯、字體與 mise-en-scène 被固定。","Sonic identity is framed through photography, editing, typography, and mise-en-scène."),
+      T("品牌合作與視覺商品化","Brand collaboration and visual commodification",6,3,"advanced","商業合作擴張影響力，也重新分配風格的收益與所有權。","Commercial collaboration expands reach while redistributing profit and ownership of style."),
+  ]),
+
+  D("recording-transition", "10", "#ef6f9a", "1979–1984：從派對進唱片", "1979–1984: from party to record", "現場文化進入唱片、電台、電影與跨國市場", "Live culture enters records, radio, film, and transnational markets",
+    [["從現場到唱片","Live to record"],["敘事與產業","Narrative & industry"],["electro 與機器","Electro & machines"],["影像與分類","Image & classification"]],
+    "單曲署名、錄音人員、廠牌資料、銷售流通、現場錄音與電影檔案", "single credits, session personnel, label data, distribution, live tapes, and film archives",
+    "最早商業發行不等於文化最早出現；錄音格式也會壓縮現場角色與集體作者", "earliest commercial release is not earliest cultural appearance, and recording compresses live roles and collective authorship",
+    ["loc","smithsonian","nmaahcTech","cambridge"], [
+      T("Rapper’s Delight 與商業突破","Rapper’s Delight and commercial breakthrough",2,0,"foundation","1979 年單曲把 rap 帶入更廣市場，也引發署名與來源問題。","The 1979 single widened rap’s market while raising credit and source questions."),
+      T("Sylvia Robinson 與 Sugar Hill Records","Sylvia Robinson and Sugar Hill Records",2,0,"core","製作、招募與唱片公司決策顯示女性產業勞動的核心位置。","Production, recruitment, and label decisions show women’s central industry labor."),
+      T("現場 routine 的錄音壓縮","Compressing live routines for records",2,0,"core","長時間派對互動被改寫為可播放、販售與重複聆聽的曲目。","Extended party interaction was rewritten as playable, saleable, repeatable tracks."),
+      T("錄音室樂手與 groove 重製","Studio bands and recreated grooves",2,1,"core","早期 rap 唱片常以樂手重奏既有 groove，而非數位採樣。","Early rap records often replayed grooves with musicians rather than digital sampling."),
+      T("The Message 與城市敘事轉向","The Message and the turn to urban narrative",2,1,"core","社會寫實成為商業 rap 的重要可能，但並非當時唯一方向。","Social realism became a major commercial possibility without defining all rap."),
+      T("獨立廠牌與區域發行","Independent labels and regional distribution",2,1,"core","小型廠牌、批發商與商店把地方聲音轉為可流通商品。","Small labels, distributors, and shops turned local sound into circulating commodities."),
+      T("電台、俱樂部與 12-inch 單曲","Radio, clubs, and the 12-inch single",2,2,"foundation","長版、混音與 DJ 播放連結舞池和廣播市場。","Extended versions, mixes, and DJ play linked dance floors to radio markets."),
+      T("Planet Rock、Kraftwerk 與 electro","Planet Rock, Kraftwerk, and electro",2,2,"advanced","跨大西洋電子聲響被重新編排成布朗克斯未來主義。","Transatlantic electronic sounds were rearranged into Bronx futurism."),
+      T("鼓機、合成器與機械律動","Drum machines, synthesizers, and machine rhythm",2,2,"core","可程式化聲音改變節奏精度、質感與現場編制。","Programmable sound changed rhythmic precision, texture, and ensemble needs."),
+      T("Wild Style、Style Wars 與文化整合","Wild Style, Style Wars, and cultural framing",2,3,"core","電影把多種實踐並置，也協助建立全球可辨識的嘻哈圖像。","Films juxtaposed practices and helped construct a globally legible hip-hop image."),
+      T("音樂錄影帶與電視入口","Music video and television gateways",3,3,"core","影像平台擴張觀眾，同時設定外觀、長度與可播性門檻。","Visual platforms expanded audiences while imposing appearance, duration, and broadcast standards."),
+      T("old school 作為回溯分類","Old school as a retrospective category",7,3,"advanced","時期名稱由後來世代建構，邊界會隨敘事目的改變。","Period labels are constructed later and shift with narrative purpose."),
+  ]),
+
+  D("sampling", "11", "#ff8552", "採樣：把舊聲音翻成新世界", "Sampling: flipping old sound into new worlds", "把錄音拆解為材料、記憶與法律關係", "Turning recordings into material, memory, and legal relations",
+    [["工具與工作流","Tools & workflow"],["作曲技法","Compositional techniques"],["品味與作者性","Taste & authorship"],["授權與替代","Clearance & alternatives"]],
+    "製作人訪談、器材限制、session 檔案、波形／節奏分析與權利文件", "producer interviews, equipment limits, session files, waveform/rhythmic analysis, and rights documents",
+    "採樣不是單純複製，也不是天然免責；美學創造與法律授權需要分開分析", "sampling is neither mere copying nor automatically exempt; aesthetic creation and legal clearance are separate questions",
+    ["schloss","copyright","nmaahcTech","loc"], [
+      T("sampler 的錄音切片邏輯","The sampler’s recorded-slice logic",3,0,"foundation","sampler 把既有聲音轉為可觸發、剪輯與重新排序的資料。","A sampler turns existing sound into triggerable, editable, reorderable data."),
+      T("鼓機的程式化節奏","Programmed rhythm on drum machines",2,0,"foundation","step、swing 與 velocity 讓節奏成為可編輯事件序列。","Steps, swing, and velocity turn rhythm into an editable event sequence."),
+      T("SP-12／SP-1200 的限制美學","The constraint aesthetics of the SP-12 / SP-1200",3,0,"core","取樣時間與解析度限制反而塑造切片、降速與粗粒質感。","Memory and resolution limits shaped chopping, slowing, and gritty texture."),
+      T("MPC 與 pad-based workflow","The MPC and pad-based workflow",4,1,"core","鼓墊、sequence 與取樣整合使 beatmaking 更像即時演奏。","Pads, sequences, and sampling integration made beatmaking more performative."),
+      T("loop、chop 與重排","Looping, chopping, and resequencing",3,1,"core","同一來源可被循環、碎片化或完全改變重音關係。","One source can be looped, fragmented, or given entirely new accent relations."),
+      T("多層採樣與聲音密度","Layered sampling and sonic density",3,1,"advanced","多個時代與音色在同一 beat 中產生互文與摩擦。","Multiple eras and timbres create intertext and friction inside one beat."),
+      T("breakbeat compilation 與資料化","Breakbeat compilations and datafication",3,2,"advanced","稀有片段被整理成工具，改變挖掘、秘密與取得門檻。","Rare passages become tools, changing digging, secrecy, and access thresholds."),
+      T("crate digging、記憶與倫理","Crate digging, memory, and ethics",3,2,"core","選樣顯示音樂史知識，也涉及來源承認與社群規範。","Sample choice displays music-historical knowledge and raises credit and community norms."),
+      T("producer signature sound","Producer signature sound",4,2,"core","切片習慣、鼓色、留白與 mix 形成可辨識作者風格。","Chopping habits, drums, space, and mixing form recognizable authorship."),
+      T("sample clearance","Sample clearance",4,3,"core","授權成本與談判能力會影響哪些聲音能正式發行。","Clearance costs and bargaining power shape what can be officially released."),
+      T("詞曲權與錄音權的雙重結構","Composition and sound-recording rights",4,3,"advanced","使用一段錄音可能同時觸及底層作品與特定錄音版本。","Using a recording may implicate both the underlying work and the specific recording."),
+      T("interpolation、replay 與替代策略","Interpolation, replay, and alternative strategies",5,3,"core","重奏旋律可避開錄音權，卻不自動免除詞曲授權。","Replaying may avoid the master right but does not automatically remove composition licensing."),
+  ]),
+
+  D("golden-age", "12", "#ffc44f", "黃金年代：經典怎麼被選出來", "Golden age: how classics get chosen", "1980 年代中後期到 1990 年代初的擴張與排除", "Expansion and exclusion from the mid-1980s into the early 1990s",
+    [["時期與跨界","Period & crossover"],["聲音與 flow","Sound & flow"],["身份與團體","Identity & collectives"],["專輯與經典","Albums & canons"]],
+    "專輯、現場、製作署名、評論、榜單、地方反應與後來經典化之間的比較", "comparison among albums, performance, credits, criticism, charts, local response, and later canonization",
+    "『黃金年代』是有用但排他的回溯標籤，可能忽略女性、地方場景與同時存在的其他美學", "'golden age' is a useful but exclusionary retrospective label that may omit women, local scenes, and coexisting aesthetics",
+    ["smithsonian","cambridge","loc","nmaahcWomen"], [
+      T("1985–1992 的時期標籤","The 1985–1992 period label",3,0,"foundation","技術、廠牌與美學快速分化，但起迄年並無唯一共識。","Technology, labels, and aesthetics diversified rapidly, but dates remain contested."),
+      T("Run-DMC 與跨界能見度","Run-DMC and crossover visibility",3,0,"core","搖滾合作、影像與品牌關係擴大市場，也重塑嘻哈形象。","Rock collaboration, video, and branding widened markets and reshaped hip-hop’s image."),
+      T("flow 複雜化與 Rakim 範式","Flow complexity and the Rakim paradigm",3,0,"advanced","內韻、延遲重音與平穩 delivery 改變 MC 技術判準。","Internal rhyme, delayed accent, and controlled delivery shifted MC standards."),
+      T("Public Enemy 的聲音密度與政治","Public Enemy: sonic density and politics",3,1,"advanced","製作拼貼、警報聲與政治修辭把聲音設計變成動員。","Production collage, sirens, and political rhetoric turn sound design into mobilization."),
+      T("De La Soul 與拼貼幽默","De La Soul and collage humor",3,1,"core","異質採樣與角色設計拓寬 rap 專輯的敘事語氣。","Heterogeneous samples and character design widened the rap album’s narrative register."),
+      T("Native Tongues 與另類共同體","Native Tongues and alternative collectivity",3,1,"core","合作網絡以 Afrocentric、爵士與玩樂反駁單一強硬形象。","A collaborative network used Afrocentricity, jazz, and play to contest one hard-edged image."),
+      T("solo MC 與專輯作者性","The solo MC and album authorship",3,2,"core","rapper 被塑造成完整專輯的中心作者，即使製作仍高度協作。","The rapper became the album’s central author despite deeply collaborative production."),
+      T("Class of ’88 與女性權威","The Class of ’88 and women’s authority",3,2,"core","多位女性 MC 以不同聲線、服裝與政治主張建立正典位置。","Women MCs asserted canonical authority through distinct voices, style, and politics."),
+      T("Afrocentricity 與歷史想像","Afrocentricity and historical imagination",3,2,"advanced","非洲符號與黑人歷史教育提供身份資源，也形成不同政治版本。","African symbols and Black historical education offer identity resources across varied politics."),
+      T("專輯作為整體陳述","The album as a coherent statement",3,3,"core","曲序、skit、製作統一與封面讓專輯成為概念性作品。","Sequencing, skits, production unity, and cover art make the album conceptual."),
+      T("雜誌、評論與 taste-making","Magazines, criticism, and taste-making",4,3,"core","評分、專訪與封面選擇參與建構誰值得被記住。","Ratings, interviews, and cover choices help construct who is remembered."),
+      T("黃金年代的排除機制","Exclusions of the golden-age canon",7,3,"advanced","經典清單必須追問地區、性別、商業偏見與檔案可得性。","Canonical lists require questions about region, gender, commerce, and archival availability."),
+  ]),
+
+  D("regionalization", "13", "#98c84a", "每座城市都有自己的低音", "Every city has its own bass", "區域聲音不是中心風格的次級版本", "Regional sounds are not secondary versions of a center",
+    [["西岸與灣區","West Coast & Bay Area"],["低音與南方城市","Bass & southern cities"],["南方網絡","Southern networks"],["中西部與區域政治","Midwest & regional politics"]],
+    "地方電台、廠牌、club、mixtape、製作技術、口音與城市產業網絡", "local radio, labels, clubs, mixtapes, production, accents, and urban industry networks",
+    "區域標籤內部差異巨大；South、West 或 Midwest 都不能被當成單一聲音", "regional labels contain major internal differences; South, West, and Midwest are not single sounds",
+    ["south","cambridge","smithsonian","keyes"], [
+      T("西岸 electro 與早期舞曲網絡","West Coast electro and early dance networks",2,0,"foundation","洛杉磯已有獨立 electro、舞團與 DJ 場景，不是東岸傳播後才開始。","Los Angeles already had electro, dance, and DJ scenes rather than merely receiving the East."),
+      T("洛杉磯 gangsta 敘事","Los Angeles gangsta narratives",3,0,"core","街區、警務與媒體衝突被轉成強烈地方敘事與市場類型。","Neighborhood, policing, and media conflict became forceful local narrative and market genre."),
+      T("G-funk 的低速 groove","G-funk’s slow groove",4,0,"core","合成器滑音、P-funk 參照與鬆弛節奏塑造西岸主流聲音。","Synth glides, P-funk references, and relaxed rhythm shaped a West Coast mainstream."),
+      T("Bay Area 的獨立經濟","Bay Area independent economies",4,0,"advanced","在地發行、汽車文化與企業自主形成不同於大廠的路徑。","Local distribution, car culture, and entrepreneurship formed alternatives to majors."),
+      T("Miami bass 與低頻身體性","Miami bass and low-frequency embodiment",3,1,"core","鼓機、車載音響、舞蹈與地方 club 組成低音文化。","Drum machines, car systems, dance, and local clubs formed a bass culture."),
+      T("Houston chopped and screwed","Houston chopped and screwed",4,1,"advanced","降速、重複與切割改變時間感，並連結地方磁帶流通。","Slowing, repetition, and cuts alter time while linking to local tape circulation."),
+      T("Atlanta、Dungeon Family 與新南方","Atlanta, Dungeon Family, and a new South",4,2,"core","funk、gospel、科幻與南方身份共同反駁兩岸中心史觀。","Funk, gospel, futurism, and southern identity contest a two-coast history."),
+      T("New Orleans bounce 與 call-and-response","New Orleans bounce and call-and-response",4,2,"core","固定節奏模板、舞蹈與在地口號形成參與式場景。","Recurring rhythmic templates, dance, and local chants create a participatory scene."),
+      T("Memphis cassette underground","The Memphis cassette underground",4,2,"advanced","低成本錄音、黑暗聲響與磁帶交換建立後來被重新發現的系譜。","Low-cost recording, dark sonics, and tape exchange built a lineage later rediscovered."),
+      T("Chicago、Detroit 與中西部差異","Chicago, Detroit, and Midwestern difference",4,3,"core","快速 flow、工業城市經驗、house／techno 鄰近性產生多種路線。","Fast flows, industrial-city experience, and proximity to house/techno create varied paths."),
+      T("口音、節奏與地方可信度","Accent, rhythm, and local credibility",4,3,"core","地方語音不是偏離標準，而是場景身份與節奏創新的資源。","Local speech is not deviation from a standard but a resource for identity and innovation."),
+      T("『The South got something to say』","“The South got something to say”",4,3,"advanced","這句話成為修正 NYC／L.A. 中心評論史的重要記憶節點。","The phrase became a key memory node correcting NYC/L.A.-centered criticism."),
+  ]),
+
+  D("politics-identity", "14", "#55c997", "誰能代表街頭？", "Who gets to represent the street?", "文化發聲、權力關係與身份競逐", "Cultural voice, power relations, and identity contests",
+    [["結構與國家","Structure & state"],["運動與社群","Movements & community"],["性別與性向","Gender & sexuality"],["身份與真實性","Identity & authenticity"]],
+    "政策史、組織檔案、歌詞與影像分析、藝術家訪談、社群反應與批判研究", "policy history, organizational archives, lyric/video analysis, interviews, community response, and critical scholarship",
+    "作品的政治意義不只由歌詞口號決定，也取決於產業、受眾、表演身份與歷史時點", "a work’s politics are not only its slogans but its industry, audience, performed identity, and historical moment",
+    ["rose","keyes","nmaahcWomen","cambridge"], [
+      T("結構性種族主義與都市政策","Structural racism and urban policy",0,0,"foundation","住宅、學校、交通與金融制度構成文化生產的不均條件。","Housing, school, transport, and finance systems shape unequal cultural conditions."),
+      T("警察暴力與監控","Police violence and surveillance",3,0,"core","作品記錄暴力經驗，也會進入媒體、抗議與國家回應。","Works document violence and enter media, protest, and state response."),
+      T("監禁、毒品戰爭與社群損失","Incarceration, the drug war, and community loss",4,0,"core","刑事政策重塑家庭、街區與 rap 的敘事位置。","Criminal policy reshaped families, neighborhoods, and rap’s narrative position."),
+      T("階級流動與炫耀消費","Class mobility and conspicuous consumption",4,1,"advanced","奢華可象徵突破排除，同時複製資本主義成功標準。","Luxury can symbolize overcoming exclusion while reproducing capitalist success metrics."),
+      T("黑人民族主義與 Afrocentricity","Black nationalism and Afrocentricity",3,1,"core","歷史教育、非洲符號與自決形成多種政治美學。","Historical education, African symbolism, and self-determination form varied political aesthetics."),
+      T("社群行動與公共教育","Community activism and public education",3,1,"core","benefit、工作坊、組織與歌曲把文化資本轉向地方行動。","Benefits, workshops, organizations, and songs redirect cultural capital toward local action."),
+      T("女性先驅與權威建構","Women pioneers and constructing authority",2,2,"foundation","女性自早期即參與 DJ、MC、製作、經營與視覺文化。","Women were present early as DJs, MCs, producers, executives, and visual creators."),
+      T("misogyny 與性別權力","Misogyny and gender power",3,2,"core","分析需要同時處理歌詞、產業勞動、影像與受眾規範。","Analysis must address lyrics, industry labor, images, and audience norms together."),
+      T("queer hip-hop 與可見性政治","Queer hip-hop and visibility politics",5,2,"advanced","酷兒創作者並非網路年代才出現，但命名與公開條件持續改變。","Queer creators did not begin online, though naming and public visibility keep changing."),
+      T("masculinity 作為表演","Masculinity as performance",3,3,"advanced","強硬、照顧、脆弱與競爭是在不同場景被學習的姿態。","Toughness, care, vulnerability, and competition are learned performances across scenes."),
+      T("世代、身體與可參與性","Generation, body, and access",7,3,"core","年齡、身體能力與場地設計影響誰能被看見與持續參與。","Age, bodily ability, and venue design shape visibility and sustained participation."),
+      T("realness、authenticity 與代表權","Realness, authenticity, and representation",6,3,"advanced","真實性不是固定屬性，而是由地方、履歷、技巧與受眾協商。","Authenticity is negotiated through place, biography, skill, and audience rather than fixed."),
+  ]),
+
+  D("industry-media", "15", "#45a8d7", "紅了以後，錢和權力去哪？", "After it blows up, where do money and power go?", "誰投資、分配、觀看並從文化獲利", "Who invests, distributes, watches, and profits",
+    [["唱片與通路","Labels & distribution"],["媒體守門","Media gatekeeping"],["創業與品牌","Entrepreneurship & brands"],["價值與勞動","Value & labor"]],
+    "合約、版稅、廠牌與發行資料、媒體排程、巡演經濟與品牌合作", "contracts, royalties, label/distribution data, media schedules, touring economies, and brand partnerships",
+    "商業化不是單向腐化或單純成功；它同時擴張資源、改變勞動並重分配控制權", "commercialization is neither simple corruption nor pure success; it expands resources, changes labor, and redistributes control",
+    ["smithsonian","keyes","cambridge","nmaahcWomen"], [
+      T("獨立廠牌與低門檻發行","Independent labels and lower-barrier release",2,0,"foundation","小型公司能快速回應地方需求，也承受資金與通路限制。","Small firms respond to local demand while facing capital and distribution limits."),
+      T("major-label deal 與控制權","Major-label deals and control",3,0,"core","預算、宣傳與全球通路伴隨合約、母帶與創作控制問題。","Budgets and global reach come with contract, master, and creative-control questions."),
+      T("零售、批發與區域市場","Retail, wholesale, and regional markets",2,0,"core","商店、街頭銷售與地方發行決定作品能否離開場景。","Stores, street sales, and local distribution determine whether work travels beyond a scene."),
+      T("radio format 與可播放性","Radio formats and airplay",3,1,"core","長度、語言、清潔版本與節目類型形成聲音守門。","Length, language, clean edits, and formats gatekeep sound."),
+      T("MTV、MV 與視覺守門","MTV, video, and visual gatekeeping",3,1,"core","進入電視擴大跨族群市場，也要求可辨識的視覺商品。","Television widened cross-demographic markets while demanding legible visual commodities."),
+      T("雜誌、部落格與評論經濟","Magazines, blogs, and criticism economies",5,1,"advanced","評論平台建立品味階序，也受廣告、存取與地區偏見影響。","Critical platforms build taste hierarchies while reflecting ads, access, and regional bias."),
+      T("巡演、club 與現場勞動","Touring, clubs, and live labor",4,2,"core","演出收入依賴 booking、保全、技師、promoter 與觀眾基礎。","Live income depends on booking, security, technicians, promoters, and audience infrastructure."),
+      T("artist-owned labels 與企業自主","Artist-owned labels and enterprise autonomy",4,2,"core","自有公司可提升控制，也增加財務、管理與勞動責任。","Ownership can increase control while adding financial, managerial, and labor responsibility."),
+      T("時尚、品牌與授權合作","Fashion, branding, and licensing",4,2,"core","文化影響轉為商品時，創作者、品牌與社群分配利益。","As influence becomes product, creators, brands, and communities divide benefit."),
+      T("排行榜、獎項與市場可見度","Charts, awards, and market visibility",7,3,"core","量化成功會改變投資與記憶，但無法完整衡量地方影響。","Measured success changes investment and memory without capturing all local influence."),
+      T("商業成功與文化價值","Commercial success and cultural value",7,3,"advanced","兩者可能重疊，也可能因通路、偏見與時間尺度而分離。","They may overlap or diverge through access, bias, and time scale."),
+      T("合約、母帶、版稅與隱形勞動","Contracts, masters, royalties, and hidden labor",7,3,"advanced","產業史必須看署名之外的製作、行政與權利結構。","Industry history must examine production, administration, and rights beyond headline credits."),
+  ]),
+
+  D("law-censorship", "16", "#7b75e4", "當歌曲走進法庭", "When a song enters the courtroom", "法律如何規範聲音、文字、演出與記憶", "How law governs sound, text, performance, and memory",
+    [["著作權結構","Copyright structure"],["訴訟與策略","Litigation & strategy"],["審查與警務","Censorship & policing"],["保存與平台","Preservation & platforms"]],
+    "法律文本、判決、授權紀錄、警務文件、媒體報導與產業工作流程", "statutes, cases, licenses, policing records, news coverage, and industry workflows",
+    "法律結果與道德判斷不是同一件事；不同國家、年代與事實會產生不同結論", "legal outcomes are not moral judgments, and jurisdiction, period, and facts change conclusions",
+    ["copyright","loc","rose","cambridge"], [
+      T("詞曲與錄音的兩層權利","Two layers: composition and recording",3,0,"foundation","一首錄音通常同時包含底層詞曲作品與特定錄音版本。","A track generally contains an underlying composition and a particular sound recording."),
+      T("採樣授權與權利追蹤","Sample clearance and rights tracing",4,0,"core","正式發行需辨認權利人、使用範圍、費用與合約條件。","Official release requires identifying owners, scope, fees, and contract terms."),
+      T("1990 年代訴訟的寒蟬效應","The chilling effect of 1990s litigation",4,0,"advanced","高額風險推動更少、更短或更易取得的樣本策略。","High risk encouraged fewer, shorter, or more easily cleared sources."),
+      T("法律風險如何改變聲音美學","How legal risk changes sonic aesthetics",4,1,"advanced","製作人轉向 interpolation、音色模仿、原創演奏或地下流通。","Producers turn to interpolation, timbral imitation, original playing, or underground circulation."),
+      T("parody、轉化性與 fair use","Parody, transformation, and fair use",4,1,"advanced","fair use 是個案衡量，沒有固定秒數會自動安全。","Fair use is case-specific; no fixed duration is automatically safe."),
+      T("Parental Advisory 與顯性內容標籤","Parental Advisory and explicit-content labels",3,1,"core","標籤回應政治壓力，也成為市場識別與世代衝突符號。","Labels answered political pressure and became market and generational symbols."),
+      T("2 Live Crew、obscenity 與表演禁令","2 Live Crew, obscenity, and performance bans",3,2,"core","地方執法把歌詞、種族、性與公共秩序拉進法庭。","Local enforcement brought lyrics, race, sex, and public order into court."),
+      T("警務壓力、場地取消與保險","Police pressure, canceled venues, and insurance",4,2,"core","行政與商業風險可在正式禁令之外限制演出。","Administrative and commercial risk can restrict shows without formal bans."),
+      T("rap lyrics 作為刑事證據","Rap lyrics as criminal evidence",6,2,"advanced","把角色化歌詞當成事實自白可能誤讀類型慣例與藝術誇飾。","Treating performed lyrics as confession can misread genre convention and artistic exaggeration."),
+      T("radio edit 與平台 moderation","Radio edits and platform moderation",6,3,"core","可見度由不同平台的內容規則、廣告需求與地區法律共同決定。","Visibility depends on content rules, advertisers, and local law across platforms."),
+      T("道德恐慌與世代權力","Moral panic and generational power",3,3,"advanced","犯罪或腐化框架常遮蔽文化內部差異與具體社會條件。","Crime and corruption frames often obscure internal diversity and concrete conditions."),
+      T("檔案保存、近用與孤兒作品","Archival preservation, access, and orphan works",7,3,"advanced","文化保存需要權利辨識、合理近用與對社群控制的尊重。","Preservation requires rights research, meaningful access, and respect for community control."),
+  ]),
+
+  D("global-local", "17", "#b65fd2", "嘻哈搭飛機：世界怎麼接招", "Hip-hop takes flight: how the world answers", "全球嘻哈不是美國模板的複製品", "Global hip-hop is not a copy of a U.S. template",
+    [["跨境媒介","Cross-border media"],["歐洲與非洲","Europe & Africa"],["亞洲與加勒比","Asia & Caribbean"],["語言與真實性","Language & authenticity"]],
+    "地方場景史、語言分析、媒體制度、國家政策、巡演與跨國合作網絡", "local scene histories, linguistic analysis, media systems, state policy, touring, and transnational collaboration",
+    "在地化研究必須尊重黑人文化起源，同時避免把非美國場景當成不完整模仿", "localization must respect Black cultural origins without treating non-U.S. scenes as incomplete imitation",
+    ["globalRap","cuba","taiwan","china"], [
+      T("唱片、電影、巡演與全球入口","Records, film, tours, and global gateways",2,0,"foundation","不同地區透過不同媒介與時間點接觸嘻哈，不是同步擴散。","Regions encountered hip-hop through different media and moments, not synchronous diffusion."),
+      T("英國 sound-system 遺產與 grime","UK sound-system legacies and grime",5,0,"core","加勒比移民史、pirate radio 與城市電子音樂形成獨特路徑。","Caribbean migration, pirate radio, and urban electronic music form a distinct path."),
+      T("法國、德國與移民青年","France, Germany, and migrant youth",4,0,"core","語言、郊區、國籍與殖民記憶重新定義代表誰。","Language, suburbs, nationality, and colonial memory redefine representation."),
+      T("Senegal 與政治 rap","Senegal and political rap",4,1,"core","地方語言、青年政治與泛非參照把 rap 轉成公共評論。","Local language, youth politics, and Pan-African reference turn rap into public commentary."),
+      T("Havana：國家排拒到制度化","Havana: from state rejection to institutionalization",4,1,"advanced","古巴 rap 從被視為外來威脅，進入國家文化機構並與 reggaetón 競逐。","Cuban rap moved from foreign threat to state institution while contesting reggaetón."),
+      T("日本嘻哈與 style 的真實性","Japanese hip-hop and stylistic authenticity",4,1,"advanced","聲音、舞蹈、服裝與黑人文化參照引發模仿、尊重與挪用辯論。","Sound, dance, dress, and Black cultural reference prompt debates over imitation, respect, and appropriation."),
+      T("韓國產業與 idol rap","Korean industry and idol rap",6,2,"core","地下場景、練習生制度與全球娛樂工業在 rap 技巧與身份上協商。","Underground scenes, trainee systems, and global entertainment negotiate rap skill and identity."),
+      T("印度的英語、地方語言與階級","English, local languages, and class in India",6,2,"core","語言選擇連結教育、階級、城市與誰能代表街頭。","Language choice links education, class, city, and claims to street representation."),
+      T("中國大陸：電視、商業化與審查","Mainland China: television, commerce, and censorship",6,2,"advanced","2017 後大眾化同時受社群、平台、商業與國家意識形態塑造。","Post-2017 massification is shaped by scenes, platforms, commerce, and state ideology."),
+      T("臺灣：解嚴、民主化與多重 rap 史","Taiwan: democratization and plural rap histories",5,3,"advanced","1980 年代媒介開放後，rap 連結本土語言、邊緣身份與後威權知識生產。","After media liberalization, rap linked local language, marginalized identity, and post-authoritarian knowledge."),
+      T("方言、code-switching 與地方 flow","Dialect, code-switching, and local flow",6,3,"core","翻譯不是換字而已；音節、重音、社會意義會重新設計 flow。","Translation redesigns syllables, accent, and social meaning rather than replacing words."),
+      T("真實性、挪用與跨地團結","Authenticity, appropriation, and translocal solidarity",7,3,"advanced","全球參與需同時追問權力、承認、利益分配與互相學習。","Global participation requires questions of power, credit, benefit, and mutual learning."),
+  ]),
+
+  D("digital-futures", "18", "#f05c74", "從 mixtape 到演算法與 AI", "From mixtapes to algorithms and AI", "平台如何重做發行、類型、社群與歷史", "How platforms remake release, genre, community, and history",
+    [["mixtape 網絡","Mixtape networks"],["平台與數據","Platforms & metrics"],["新聲音與製作","New sound & production"],["制度與未來","Institutions & futures"]],
+    "mixtape 目錄、數位平台資料、製作工作流、演算法介面、博物館與大學收藏政策", "mixtape catalogs, platform data, production workflows, algorithmic interfaces, and museum/university collecting policies",
+    "平台數據可見度不等於完整文化影響；最新類型仍在變動，需標記時間與不確定性", "platform visibility is not total cultural impact; emerging genres remain in motion and require dates and uncertainty",
+    ["smithsonian","cornell","globalRap","copyright"], [
+      T("mixtape DJ 與策展權威","Mixtape DJs and curatorial authority",4,0,"foundation","選曲、獨家、喊話與混音讓 DJ 成為市場與場景的仲介。","Selection, exclusives, drops, and mixing make DJs intermediaries between scene and market."),
+      T("街頭發行、bootleg 與灰色經濟","Street distribution, bootlegs, and gray economies",4,0,"core","非正式流通提高速度與近用，也模糊授權與報酬。","Informal circulation increases speed and access while blurring permission and payment."),
+      T("P2P、MP3 與部落格年代","P2P, MP3, and the blog era",5,0,"core","低成本複製打破地理通路，讓新評論者與資料庫興起。","Low-cost copying broke geographic distribution and enabled new critics and archives."),
+      T("社群媒體與病毒式片段","Social media and viral fragments",6,1,"core","短片、舞蹈挑戰與 meme 把歌曲拆成可重複的社交單位。","Short clips, dance challenges, and memes split songs into repeatable social units."),
+      T("串流 playlist 與演算法守門","Streaming playlists and algorithmic gatekeeping",6,1,"advanced","推薦、skip rate 與編輯選曲影響作品長度、開場與可見度。","Recommendation, skip rates, and editorial placement affect duration, openings, and visibility."),
+      T("播放量、榜單與數據自我","Streams, charts, and the quantified self",6,1,"advanced","即時指標改變宣傳與創作決策，也可能放大既有優勢。","Live metrics reshape promotion and creative decisions while amplifying existing advantage."),
+      T("trap 的 hi-hat、808 與工作流","Trap hi-hats, 808s, and workflow",5,2,"core","快速細分 hi-hat、低頻滑音與 DAW pattern 成為跨區域語彙。","Divided hi-hats, sliding low end, and DAW patterns became transregional vocabulary."),
+      T("drill 作為跨城市形式","Drill as a transcity form",6,2,"advanced","Chicago、London、Brooklyn 等地以不同節奏、警務與地方敘事在地化。","Chicago, London, Brooklyn, and others localize drill through rhythm, policing, and place narrative."),
+      T("臥室製作、DAW 與 beat store","Bedroom production, DAWs, and beat stores",6,2,"core","全球工具與線上市場降低進入成本，也改變授權和同質化風險。","Global tools and marketplaces lower entry barriers while changing licensing and homogenization risks."),
+      T("battle 平台、podcast 與長篇口述","Battle platforms, podcasts, and long-form testimony",6,3,"core","數位平台同時保存表演、創造評論市場並重寫歷史口述。","Platforms preserve performance, create commentary markets, and rewrite oral history."),
+      T("博物館、大學與五十週年制度化","Museums, universities, and 50th-anniversary institutionalization",7,3,"advanced","典藏提升文化地位，也帶來誰被保存、如何分類與誰能近用的問題。","Collection raises status while asking who is preserved, categorized, and granted access."),
+      T("AI、合成聲音與未來檔案","AI, synthetic voice, and future archives",7,3,"advanced","生成工具挑戰聲音身份、同意、作者性與可驗證的歷史證據。","Generative tools challenge vocal identity, consent, authorship, and verifiable historical evidence."),
+  ]),
+];
+
+const SP = (questionZh, questionEn, meaningZh, meaningEn, examples) => ({
+  question: { zh: questionZh, en: questionEn },
+  meaning: { zh: meaningZh, en: meaningEn },
+  examples: examples.map(([zh, en]) => ({ zh, en })),
+});
+
+const STORY_PACKS = {
+  historiography: SP(
+    "到底誰的版本會被留下來？", "Whose version gets remembered?",
+    "嘻哈史不是排行榜抄一抄。誰有照片、誰被採訪、誰的磁帶活到今天，都會改變我們以為的『歷史』。", "Hip-hop history is not a copied chart. Who was photographed, interviewed, or preserved on tape changes what we think the story is.", [
+      ["Cornell 收藏的早期派對傳單，票價、場地、DJ 排名和電話全在上面；一張紙就能把當年的活動網絡拼回來。", "Cornell’s early party flyers preserve prices, venues, DJ billing, and phone numbers—one sheet can rebuild an event network."],
+      ["Joe Conzo Jr. 拍下 1977–84 年的南布朗克斯 jam、街景和拉丁音樂現場；照片很珍貴，但鏡頭外的人仍可能消失。", "Joe Conzo Jr. photographed South Bronx jams, streets, and Latin music from 1977–84; the images matter, but people outside the frame can still disappear."],
+      ["1520 Sedgwick 是大家共同認的生日地標；更準確的說法，是它是一個超重要的紀念站，不是所有元素一夜從天上掉下來。", "1520 Sedgwick is a shared birthday landmark—a crucial stop, not a claim that every element fell from the sky in one night."],
+      ["Library of Congress 保存《Rapper’s Delight》等錄音，是在說『這值得留下』，不是宣布這就是唯一正統。", "When the Library of Congress preserves records such as “Rapper’s Delight,” it says they deserve to survive—not that they are the only canon."],
+    ]),
+  "black-continuities": SP(
+    "一支麥克風，為什麼能讓整群人一起進拍？", "How can one microphone pull a whole crowd into the beat?",
+    "rap 的厲害不只在押韻，而是把黑人社群長期的呼應、炫技、講古和節奏感，重新塞進派對與錄音裡。", "Rap’s power is bigger than rhyme: it remixes long Black traditions of response, verbal play, storytelling, and rhythm inside parties and records.", [
+      ["早期 MC 喊出『somebody say…』，群眾回一句；歌不是台上單向輸出，而是全場一起完成。", "An early MC calls “somebody say…” and the crowd answers—the song is finished by the room, not delivered one-way from the stage."],
+      ["DJ 會專挑 James Brown 唱片裡鼓和貝斯最兇的 break，因為舞者聽到那裡真的會爆。", "DJs hunted the hardest drum-and-bass breaks in James Brown records because dancers visibly erupted when those moments hit."],
+      ["The Last Poets、Gil Scott-Heron 的 spoken word 讓詩、政治和 groove 靠得很近；它們是重要前輩，不需要硬說成唯一『rap 之父』。", "The Last Poets and Gil Scott-Heron brought poetry, politics, and groove close together—major predecessors without needing a single “father of rap” myth."],
+      ["《The Message》把破敗街區、壓力和快撐不住的日常送進商業單曲，證明 party music 也能直視生活。", "“The Message” put neighborhood decay, pressure, and survival into a commercial single, proving party music could stare daily life in the face."],
+    ]),
+  caribbean: SP(
+    "聲音是怎麼坐船、搭飛機，再在布朗克斯變出新招？", "How did sound cross water and become something new in the Bronx?",
+    "加勒比影響不是在背景放一面牙買加國旗，而是音響、主持、版本、競賽和移民生活真的進入了現場做法。", "Caribbean influence is not a flag in the background; amplification, toasting, versions, competition, and migration changed what people actually did.", [
+      ["牙買加 sound system 把大喇叭、selector、deejay 和街區舞會包成一套文化；聲音夠大，本身就是號召力。", "Jamaican sound systems joined giant speakers, selectors, deejays, and neighborhood dances into one culture—volume itself carried authority."],
+      ["Kool Herc 在牙買加長大，但到布朗克斯後沒有照搬 reggae set；他看舞池反應，改用大家最吃的 funk break。", "Kool Herc grew up in Jamaica, but he did not simply copy a reggae set in the Bronx; he followed the room and leaned into the funk breaks dancers wanted."],
+      ["dub 會把人聲抽掉、放大鼓和 bass、加 echo；這種『把錄音拆開再造空間』的想法，和後來 hip-hop 製作很聊得來。", "Dub removes voices, enlarges drums and bass, and throws in echo—the idea of taking a recording apart to build space speaks directly to later hip-hop production."],
+      ["sound clash 比的不只是歌單：誰有更稀有的 dubplate、誰的系統更猛、誰能讓現場回應，全部都算。", "A sound clash is more than a playlist: rare dubplates, system power, and the ability to move a crowd all count."],
+    ]),
+  bronx: SP(
+    "當城市把資源抽走，年輕人怎麼自己蓋舞台？", "When a city pulls resources out, how do young people build their own stage?",
+    "布朗克斯不是一張『廢墟很酷』的電影海報。真正的故事，是家庭、住宅公共室、公園和街角如何撐出創作空間。", "The Bronx is not a cool ruin in a movie poster. The real story is how families, community rooms, parks, and corners held space for creation.", [
+      ["Cross Bronx Expressway 的拆遷和都市更新切開了住宅與商業網絡；hip-hop 的地方感，和這種城市傷口分不開。", "Cross Bronx Expressway clearance cut through housing and business networks; hip-hop’s sense of place is inseparable from that urban wound."],
+      ["1520 Sedgwick 的 community room 不是豪華 club，卻有門、有電、能收門票，已經足夠讓一場派對改變歷史。", "The community room at 1520 Sedgwick was no luxury club, but it had a door, electricity, and room to charge admission—enough for a historic party."],
+      ["Cedar Park 之類的戶外空間，把喇叭、延長線、舞者和整個街區拉到同一塊地上。", "Outdoor spaces such as Cedar Park brought speakers, extension cords, dancers, and the neighborhood onto one shared ground."],
+      ["1977 blackout 後大家去搶器材的傳說很好講，但證據沒那麼乾脆；這正是『街頭神話』和可查歷史的差別。", "The story that everyone grabbed gear after the 1977 blackout is irresistible, but evidence is less clean—exactly the gap between street legend and verifiable history."],
+    ]),
+  "early-scenes": SP(
+    "在還沒有 rap 明星以前，一場派對靠誰撐起來？", "Before rap stars existed, who held a party together?",
+    "最早的 scene 是很多人的勞動：有人找場地、畫傳單、搬喇叭、守門、放歌、拿麥克風，再靠口耳相傳把人叫來。", "The earliest scene was collective labor: booking rooms, drawing flyers, carrying speakers, working doors, playing records, holding mics, and spreading the word.", [
+      ["Cindy Campbell 辦返校派對、收門票想買新衣，哥哥 Kool Herc 負責音樂；這個起點本來就同時有家庭、女孩的主意和小型經濟。", "Cindy Campbell organized a back-to-school party and charged admission for new clothes while her brother Kool Herc played—family, a young woman’s idea, and a tiny economy were there from the start."],
+      ["Herc 的招牌不是播完整首歌，而是拿兩張同樣唱片，把舞者最愛的 break 接長。", "Herc’s signature was not simply playing whole songs; he used two copies to extend the break dancers loved."],
+      ["Grandmaster Flash 研究 cueing 和 quick-mix，讓 DJ 不只是靠感覺撞運氣，而能精準回到同一拍。", "Grandmaster Flash studied cueing and quick-mix technique so a DJ could return to the same beat with precision instead of luck."],
+      ["Buddy Esquire 的傳單把藝名畫得像超級英雄海報；誰排最大、誰在最上面，本身就是 scene 裡的地位。", "Buddy Esquire’s flyers billed names like superhero posters; who appeared biggest and highest was part of scene status."],
+    ]),
+  mcing: SP(
+    "一句話怎麼踩進鼓點，還能把人逗笑、惹火或說服？", "How does a sentence step into the drums and still make people laugh, flare up, or listen?",
+    "flow 是嘴巴、呼吸和 beat 的舞步。內容很重要，但同一句詞放在不同拍點、口氣和音色上，會變成完全不同的人。", "Flow is a dance among mouth, breath, and beat. Words matter, but placement, tone, and timbre can turn the same line into a different person.", [
+      ["最早的 MC 先是 party rocker：介紹 DJ、喊 crew、叫左邊右邊回話，讓冷掉的場子重新熱起來。", "The earliest MCs were party rockers—introducing DJs, shouting crews, calling to each side of the room, and reheating a fading crowd."],
+      ["Rakim 常被拿來講 flow 革新，因為他的內韻和延遲重音不急著每拍都砸下去，反而更穩、更深。", "Rakim is central to flow history because internal rhyme and delayed accents did not hammer every beat; they sat deeper in the pocket."],
+      ["Roxanne Wars 讓一個名字變成大量 answer records；battle 不只當面對決，也能靠唱片一首接一首回嗆。", "The Roxanne Wars turned one name into waves of answer records; battle could unfold track by track, not only face to face."],
+      ["臺灣 rapper 在華語、臺語、客語或原住民族語之間切換時，音節長短和地方口氣會直接改寫 flow。", "When Taiwanese rappers move among Mandarin, Taiwanese, Hakka, or Indigenous languages, syllable shape and local voice directly rewrite the flow."],
+    ]),
+  "dj-beats": SP(
+    "兩台唱盤為什麼不只是播放機，而能變成樂器？", "How do two playback machines become an instrument?",
+    "DJ 的本事一半在手，一半在腦內唱片庫：知道哪一秒會炸、怎麼接回去、什麼時候別出手。", "A DJ’s craft lives half in the hands and half in an internal record library: knowing what second will explode, how to return, and when not to touch anything.", [
+      ["拿兩張相同唱片輪流回到 break，原本幾秒的鼓可以撐成舞者的整個世界。", "Alternating two copies at the break turns a few seconds of drums into a whole world for dancers."],
+      ["Grandmaster Flash 會研究唱片位置和 cue 點；對舞池來說，那些看不見的準備就是『怎麼每次都準時落地』。", "Grandmaster Flash studied record position and cue points; for the dance floor, invisible preparation is why the beat lands on time."],
+      ["Grand Wizzard Theodore 的 scratching 故事常從手碰到唱片開始，但真正的歷史還包括他怎麼發展、命名和讓別人聽見。", "Grand Wizzard Theodore’s scratching story often begins with a hand on a record, but the history also includes development, naming, and diffusion."],
+      ["DMC 類型的 DJ battle 把 cutting、juggling 和編排放到競技舞台，唱盤真的被當成主奏樂器。", "DMC-style battles put cutting, juggling, and arrangement on a competitive stage, treating the turntable as a lead instrument."],
+    ]),
+  breaking: SP(
+    "鼓一進 break，身體為什麼會像在回嘴？", "When the break drops, why does the body look like it is talking back?",
+    "breaking 不是招式清單。舞者要讀音樂、佔空間、挑戰對手，也要讓每一個 freeze 像句點一樣落在對的位置。", "Breaking is not a move list. Dancers read music, claim space, challenge rivals, and land each freeze like punctuation.", [
+      ["Rock Steady Crew 1977 年在布朗克斯形成，crew 不只是隊名，也是學招、出戰和保存地方 style 的家。", "Rock Steady Crew formed in the Bronx in 1977; a crew is not just a name but a home for learning, battling, and preserving local style."],
+      ["cypher 中間沒有正式舞台，圓圈本身就是舞台；你什麼時候進、怎麼回應上一個人，全場都看得懂。", "A cypher needs no formal stage—the circle is the stage, and everyone reads when you enter and how you answer the previous dancer."],
+      ["《Style Wars》《Beat Street》等影像讓全球觀眾第一次大量看到 breaking，也讓媒體用自己的方式重新包裝它。", "Films such as “Style Wars” and “Beat Street” gave global audiences a major view of breaking while repackaging it through media logic."],
+      ["Breaking 進入 2024 巴黎奧運後，能見度暴增，但社群也開始問：評分表能不能裝得下 style、cypher 和歷史？", "Breaking’s 2024 Paris Olympic debut raised visibility and a hard question: can a score sheet contain style, cypher culture, and history?"],
+    ]),
+  "visual-culture": SP(
+    "還沒聽到音樂以前，hip-hop 已經先讓你看見什麼？", "Before the music starts, what does hip-hop make you see?",
+    "名字、字體、球鞋、珠寶和照片都在說『我是誰、我從哪裡來、你最好記住』。視覺不是包裝，是現場的一部分。", "Names, lettering, sneakers, jewelry, and photographs say: this is who I am, where I am from, and why you should remember. Visuals are not packaging; they are scene.", [
+      ["writer 把 tag 留在列車上，名字會穿過整座城市；城市清除它，反而證明這些字真的搶到了注意力。", "A writer’s tag rides a train across the city; removal campaigns show that the names really did capture attention."],
+      ["Buddy Esquire 的 flyer 手稿留下字體、排版和修改痕跡，讓我們看到早期 hip-hop 平面設計不是隨便寫寫。", "Buddy Esquire’s flyer drafts preserve lettering, layout, and revision, showing that early hip-hop graphic design was deliberate craft."],
+      ["1988 年那張女性 rapper 集體照裡，MC Lyte、Roxanne Shanté 等人用服裝、姿態和站位一起宣告專業權威。", "In the 1988 group portrait of women rappers, MC Lyte, Roxanne Shanté, and others claim authority through dress, posture, and placement."],
+      ["Fab 5 Freddy 在街頭、藝廊、電影和電視之間穿梭，讓 graffiti 與 rap 被更大市場看見，也把『誰擁有風格』的問題帶進來。", "Fab 5 Freddy moved among streets, galleries, film, and television, widening visibility while raising the question of who owns a style."],
+    ]),
+  "recording-transition": SP(
+    "一場幾小時的派對，怎麼被塞進一張幾分鐘的唱片？", "How does an hours-long party fit inside a few minutes of vinyl?",
+    "錄音把現場送到全世界，也把很多東西改掉：MC 變成主角、DJ 可能退到後面、唱片公司開始決定誰能被聽見。", "Recording sent the scene worldwide and changed it: MCs moved forward, DJs could move back, and labels began deciding who was heard.", [
+      ["1979 年《Rapper’s Delight》用樂手重奏 Chic〈Good Times〉的 groove，不是今天想像的數位拖拉採樣；它卻讓 rap 第一次大規模進入唱片市場。", "In 1979, “Rapper’s Delight” used musicians to replay Chic’s “Good Times” groove rather than modern digital drag-and-drop sampling, yet it pushed rap into a mass record market."],
+      ["Sylvia Robinson 組織 Sugarhill Gang、製作並發行唱片；這段歷史提醒我們，女性不只站在麥克風前，也在決定錄什麼、怎麼賣。", "Sylvia Robinson assembled the Sugarhill Gang and produced and released the record—women were deciding what got recorded and sold, not only taking the mic."],
+      ["《The Message》讓商業市場聽見城市壓力；但別忘了，當時同時還有 party rap、electro、battle 和大量其他聲音。", "“The Message” brought urban pressure to a commercial audience, while party rap, electro, battles, and many other sounds kept moving alongside it."],
+      ["《Planet Rock》把 Kraftwerk、鼓機和布朗克斯舞池接在一起；聽起來像未來，其實是不同城市的錄音被重新組裝。", "“Planet Rock” connected Kraftwerk, drum machines, and the Bronx dance floor—it sounded futuristic because recordings from different cities were rebuilt together."],
+    ]),
+  sampling: SP(
+    "拿別人的一秒聲音，怎麼做出只有你才會做的世界？", "How can one borrowed second become a world only you would build?",
+    "採樣像聲音版塗鴉：你要找牆、選位置、切出線條、疊上自己的名字；創意很真，權利問題也同樣真。", "Sampling is sonic graffiti: find a wall, choose the spot, cut the line, and place your name. The creativity is real, and so are the rights questions.", [
+      ["SP-1200 的記憶很少、聲音也不乾淨，製作人反而用降速、切碎和重排，把限制做成招牌質地。", "The SP-1200 had little memory and imperfect sound, so producers slowed, chopped, and resequenced until limitation became signature texture."],
+      ["Public Enemy 的 Bomb Squad 疊上大量片段、噪音和鼓，讓 beat 像整座城市同時在叫；那不是找一個 loop 就結束。", "Public Enemy’s Bomb Squad layered fragments, noise, and drums until a beat sounded like a whole city shouting—not a one-loop shortcut."],
+      ["De La Soul 的拼貼美學後來碰到昂貴授權與重新上架問題，說明一張經典能不能進串流，還會被三十年前的 sample 合約卡住。", "De La Soul’s collage aesthetic later faced costly clearance and re-release problems, showing how decades-old sample deals can block a classic from streaming."],
+      ["如果請樂手重奏一段旋律，可能避開原錄音的 master 權，卻仍可能要處理底層詞曲；『我沒用原檔』不等於完全沒事。", "Replaying a melody may avoid the original master right while still implicating the composition—“I did not use the file” does not end the story."],
+    ]),
+  "golden-age": SP(
+    "大家說『黃金年代』時，誰被放進金框，誰又被裁掉？", "When people say “golden age,” who gets the gold frame—and who gets cropped out?",
+    "這時期真的創意爆炸，但『最好』是後來的人選出來的。經典值得聽，也要問女性、地方 scene 和不合主流口味的作品去了哪裡。", "Creativity exploded, but “the best” was selected later. Hear the classics, then ask where women, local scenes, and unfashionable records went.", [
+      ["Run-DMC 與 Aerosmith 的〈Walk This Way〉把 rap 送進更大的搖滾與 MTV 市場，同時也讓 crossover 變成產業公式。", "Run-DMC and Aerosmith’s “Walk This Way” pushed rap into rock and MTV markets while turning crossover into an industry formula."],
+      ["Eric B. & Rakim 的《Paid in Full》常被拿來講 flow、空間和 MC 作者性：聲音不用一直吼，也能把整首歌壓住。", "Eric B. & Rakim’s “Paid in Full” is central to flow, space, and MC authorship: a voice can command a track without shouting nonstop."],
+      ["Public Enemy 與 Bomb Squad 把密集採樣、警報和政治語言塞在一起，讓製作本身就像抗議現場。", "Public Enemy and the Bomb Squad fused dense samples, alarms, and political language until production itself felt like protest."],
+      ["MC Lyte、Queen Latifah、Salt-N-Pepa 等人不是『女性特別篇』，而是當時 flow、政治、流行市場和造型全部都在改變的主角。", "MC Lyte, Queen Latifah, and Salt-N-Pepa are not a women’s bonus chapter; they were central to changing flow, politics, pop reach, and style."],
+    ]),
+  regionalization: SP(
+    "如果紐約不是唯一中心，每座城市會把低音和口音變成什麼？", "If New York is not the only center, what does each city do with bass and accent?",
+    "地方聲音不是『學紐約學得不一樣』。車子、club、電台、磁帶、口音和城市生活，會自己長出完全不同的鼓和 flow。", "Regional sound is not New York copied differently. Cars, clubs, radio, tapes, accents, and city life grow different drums and flows.", [
+      ["N.W.A. 把洛杉磯警務、街區和媒體衝突推到全國；G-funk 後來又用合成器滑音和慢 groove 做出另一種西岸想像。", "N.W.A. pushed Los Angeles policing and neighborhood conflict nationwide; G-funk later built another West Coast image through synth glides and slow grooves."],
+      ["DJ Screw 在 Houston 把歌降速、重複、切割，磁帶在車內和街區流通；chopped and screwed 是地方時間感，不只是特效。", "DJ Screw slowed, repeated, and cut music in Houston as tapes circulated through cars and neighborhoods; chopped and screwed is local time, not just an effect."],
+      ["1995 Source Awards 上 André 3000 說『the South got something to say』，一句話變成南方反擊兩岸中心史觀的歷史標記。", "At the 1995 Source Awards, André 3000 said “the South got something to say,” creating a historical marker against two-coast thinking."],
+      ["Memphis 地下磁帶的低成本鼓機、黑暗 loop 和交換網絡，後來被新世代大量挖出，影響 trap 與網路製作。", "Memphis underground tapes used cheap drum machines, dark loops, and exchange networks later rediscovered by generations shaping trap and online production."],
+    ]),
+  "politics-identity": SP(
+    "誰有資格說『我代表這裡』，又是誰一直被叫閉嘴？", "Who gets to say “I represent this place,” and who keeps getting told to be quiet?",
+    "hip-hop 可以是抗議、求生、炫耀、幽默和矛盾同時存在。真正接地氣的讀法，不是把每首歌判成政治正確或錯，而是看誰在什麼權力裡說話。", "Hip-hop can be protest, survival, flexing, humor, and contradiction at once. A grounded reading asks who is speaking inside what power—not whether every track passes a purity test.", [
+      ["Public Enemy 的〈Fight the Power〉和 Spike Lee《Do the Right Thing》一起出現，歌曲、電影與街頭政治互相放大。", "Public Enemy’s “Fight the Power” arrived with Spike Lee’s “Do the Right Thing,” amplifying one another across song, film, and street politics."],
+      ["Queen Latifah 的〈Ladies First〉把女性團結放到主畫面，不是請求男 rapper 讓位，而是直接建立自己的權威。", "Queen Latifah’s “Ladies First” put women’s solidarity in the center—not asking male rappers for space, but claiming authority outright."],
+      ["Yo-Yo 把 crew 叫做 Intelligent Black Woman’s Coalition，讓舞台身份和社群教育、反性別歧視連在一起。", "Yo-Yo called her crew the Intelligent Black Woman’s Coalition, tying stage identity to community education and resistance to sexism."],
+      ["Big Freedia 把 New Orleans bounce 帶到全球，也提醒大家：酷兒與性別多元的聲音一直在地方 scene 裡，不是社群媒體突然發明的。", "Big Freedia took New Orleans bounce worldwide, reminding audiences that queer and gender-diverse voices lived in local scenes long before social media noticed."],
+    ]),
+  "industry-media": SP(
+    "文化紅了之後，錢從哪裡進來，又從誰手上溜走？", "Once the culture blows up, where does money enter—and whose hands does it miss?",
+    "嘻哈產業史就是控制權的故事：母帶在誰手上、誰能上電台、誰拿巡演錢、誰的 style 被品牌賣出去。", "Hip-hop industry history is a control story: who owns masters, gets radio, earns touring money, and sees their style sold by brands.", [
+      ["Sugar Hill 這種獨立廠牌讓 rap 快速進唱片店，但『能發行』和『創作者拿到公平權利』從來不是同一題。", "Independent labels such as Sugar Hill moved rap into stores quickly, but release access and fair creator rights were never the same question."],
+      ["Run-DMC 在演唱會把 Adidas 球鞋舉成整場共同符號，後來品牌合作證明街頭 style 已經能反過來影響跨國公司。", "Run-DMC turned Adidas sneakers into a crowd-wide symbol in concert; the later brand deal showed street style influencing a global company."],
+      ["Master P 以 No Limit 建立更有利的發行與品牌模式，讓『rapper 也是老闆』不只是口號，而是談判籌碼。", "Master P built No Limit around stronger distribution and branding, making “rapper as owner” a negotiating position rather than a slogan."],
+      ["今天一首歌能不能進大型 playlist，可能比地方電台更快改變命運；新的守門人從 DJ 辦公室搬進演算法和平台編輯台。", "A major playlist can now shift a track faster than local radio; gatekeepers moved from DJ booths into algorithms and platform desks."],
+    ]),
+  "law-censorship": SP(
+    "一首歌什麼時候變成法庭證物、禁播名單或昂貴帳單？", "When does a song become courtroom evidence, a ban, or an expensive invoice?",
+    "法律不只在歌做完後出現。它會反過來改變你敢採幾層、演出能不能辦、歌詞會不會被當成自白。", "Law does not arrive only after the track is done. It changes how many layers get sampled, whether shows happen, and whether lyrics are treated as confession.", [
+      ["一段 sample 可能同時碰到詞曲權和原錄音權；就像租到劇本，不代表也租到某一場演出的錄影。", "A sample may touch composition and master rights at once—licensing the script does not automatically license one filmed performance."],
+      ["1990 年代初的採樣訴訟讓唱片公司更怕未授權片段，製作人開始少疊、改重奏或乾脆把作品留在地下。", "Early-1990s sampling litigation made labels fear uncleared fragments, pushing producers toward fewer layers, replays, or underground release."],
+      ["2 Live Crew 的訴訟同時碰到 obscenity、演出禁令和 parody fair use；rap 的幽默、性與種族政治真的被拉進法庭。", "2 Live Crew cases brought obscenity, performance bans, and parody fair use into court alongside rap’s humor, sex, and racial politics."],
+      ["檢方把 rap lyrics 當犯罪自白時，可能忽略角色、誇飾和 battle 修辭；電影反派的台詞不會自動變成演員供詞。", "When prosecutors treat rap lyrics as confession, they may ignore persona, exaggeration, and battle rhetoric—a movie villain’s lines do not become the actor’s testimony."],
+    ]),
+  "global-local": SP(
+    "hip-hop 到了別的城市，是模仿美國，還是開始講自己的真話？", "When hip-hop reaches another city, is it copying America—or starting to tell local truth?",
+    "真正的全球化不是把英文換成本地語言。每個地方都會重新處理口音、種族、國家、審查、階級和『夠不夠 real』。", "Globalization is not swapping English for local words. Every place renegotiates accent, race, nation, censorship, class, and what counts as real.", [
+      ["法國團體 IAM、Suprême NTM 等人把郊區、移民和殖民記憶放進法語 rap，聲音不是美國城市的翻譯稿。", "French groups such as IAM and Suprême NTM put suburbs, migration, and colonial memory into rap that was not a translation of an American city."],
+      ["Senegal 的 Y’en a Marre 由 rapper 與記者組成，2011 年起用音樂和公民行動介入政治，證明 rap 能直接成為組織工具。", "Senegal’s Y’en a Marre, formed by rappers and journalists, used music and civic action from 2011 onward, turning rap into an organizing tool."],
+      ["古巴 rap 從被官方視為外來威脅，到出現 Cuban Rap Agency；進入制度帶來資源，也帶來誰能被代表的新問題。", "Cuban rap moved from foreign threat to the Cuban Rap Agency; institutional support brought resources and new questions about representation."],
+      ["臺灣從 L.A. Boyz、MC HotDog 到拷秋勤等不同路線，把華語、臺語、地方政治與解嚴後的媒體空間塞進 rap，形成不只一條的本地史。", "In Taiwan, routes from L.A. Boyz and MC HotDog to Kou Chou Ching put Mandarin, Taiwanese, local politics, and post-martial-law media space into more than one rap history."],
+    ]),
+  "digital-futures": SP(
+    "當唱片店變成手機螢幕，誰還在決定下一首紅歌？", "When the record store becomes a phone screen, who decides the next hit?",
+    "網路降低發行門檻，卻沒有消滅守門人。mixtape DJ、blog、平台編輯、演算法、短影音和 AI，只是不斷把門換到別的位置。", "The internet lowered release barriers without killing gatekeepers. Mixtape DJs, blogs, editors, algorithms, short video, and AI keep moving the door.", [
+      ["50 Cent 用 mixtape 改寫熱門歌曲、快速回應對手，把非正式發行變成建立街頭聲量和唱片談判力的武器。", "50 Cent used mixtapes to flip popular songs and answer rivals quickly, turning informal release into street momentum and label leverage."],
+      ["DatPiff 和 blog era 讓一張 mixtape 能繞過實體店瞬間跨州，但下載數與首頁位置也成為新的能見度競賽。", "DatPiff and the blog era let mixtapes bypass stores and cross states instantly, while downloads and homepage placement became new visibility contests."],
+      ["Soulja Boy 利用 MySpace、YouTube 和可模仿舞蹈打開全國市場，顯示病毒傳播可以從臥室反攻大公司。", "Soulja Boy used MySpace, YouTube, and a repeatable dance to reach a national market, showing viral circulation moving from bedroom to major industry."],
+      ["當博物館慶祝 hip-hop 50 週年、AI 又能仿聲時，新的問題同時出現：誰被收藏、誰同意被模仿、未來的人要相信哪一個檔案？", "As museums mark hip-hop at 50 and AI can imitate voices, new questions collide: who is collected, who consented to imitation, and what archive will future listeners trust?"],
+    ]),
+};
+
+const CROSS_LINKS = [
+  ["d02-c06","d05-c05","samples"],["d03-c01","d05-c04","influences"],["d03-c03","d05-c08","influences"],["d04-c06","d05-c02","enables"],
+  ["d01-c02","d05-c10","documents"],["d01-c07","d05-c02","canonizes"],["d05-c05","d07-c04","influences"],["d05-c08","d06-c01","precedes"],
+  ["d07-c02","d08-c01","enables"],["d08-c08","d06-c09","influences"],["d09-c06","d01-c02","documents"],["d09-c05","d01-c03","documents"],
+  ["d05-c08","d10-c03","commercializes"],["d10-c01","d15-c01","enables"],["d10-c04","d11-c05","precedes"],["d10-c08","d11-c02","influences"],
+  ["d07-c09","d11-c08","precedes"],["d11-c06","d12-c04","enables"],["d11-c10","d16-c02","regulates"],["d11-c11","d16-c01","regulates"],
+  ["d12-c12","d13-c12","marginalizes"],["d13-c12","d12-c12","responds"],["d13-c07","d15-c08","enables"],["d13-c06","d18-c01","influences"],
+  ["d14-c07","d09-c10","frames"],["d09-c10","d14-c07","documents"],["d14-c12","d17-c12","localizes"],["d15-c04","d16-c10","regulates"],
+  ["d15-c05","d12-c11","canonizes"],["d16-c07","d14-c08","responds"],["d16-c09","d06-c12","responds"],["d17-c01","d08-c11","circulates"],
+  ["d17-c10","d06-c11","localizes"],["d03-c11","d17-c01","circulates"],["d17-c05","d18-c11","institutionalizes"],["d18-c03","d13-c09","revives"],
+  ["d18-c04","d09-c11","adapts"],["d18-c05","d15-c10","canonizes"],["d18-c07","d13-c10","localizes"],["d18-c11","d01-c08","institutionalizes"],
+  ["d18-c12","d01-c04","responds"],["d02-c04","d06-c01","influences"],["d02-c05","d14-c05","influences"],["d02-c10","d10-c05","influences"],
+  ["d03-c04","d11-c06","influences"],["d04-c12","d14-c01","responds"],["d05-c10","d09-c06","documents"],["d06-c11","d17-c11","localizes"],
+  ["d07-c08","d08-c09","influences"],["d08-c12","d18-c11","institutionalizes"],["d09-c07","d18-c11","institutionalizes"],["d10-c10","d17-c01","circulates"],
+  ["d11-c08","d02-c08","revives"],["d12-c08","d14-c07","canonizes"],["d13-c03","d15-c04","commercializes"],["d14-c06","d18-c10","circulates"],
+  ["d15-c09","d09-c12","commercializes"],["d16-c12","d01-c11","regulates"],["d17-c09","d16-c10","regulates"],["d17-c10","d14-c12","frames"],
+];
+
+function buildAtlas() {
+  const concepts = [];
+  DOMAINS.forEach((domain, di) => {
+    domain.topics.forEach((topic, ti) => {
+      const id = `d${String(di + 1).padStart(2, "0")}-c${String(ti + 1).padStart(2, "0")}`;
+      const cluster = domain.clusters[topic.cluster];
+      const storyPack = STORY_PACKS[domain.id];
+      concepts.push({
+        id, domainId: domain.id, domainIndex: di, order: ti, color: domain.color,
+        title: { zh: topic.zh, en: topic.en },
+        summary: {
+          zh: `這一站聊的是「${topic.zh}」。${topic.note.zh}`,
+          en: `This stop is about “${topic.en}” — ${topic.note.en}`,
+        },
+        claim: {
+          zh: `${topic.note.zh} 背後那個真正的問題是：${storyPack.question.zh}`,
+          en: `${topic.note.en} The bigger question underneath is: ${storyPack.question.en}`,
+        },
+        meaning: storyPack.meaning,
+        evidence: {
+          zh: storyPack.examples[topic.cluster].zh,
+          en: storyPack.examples[topic.cluster].en,
+        },
+        caution: {
+          zh: `好聽的傳說通常只講一半。${domain.caution.zh}`,
+          en: `The cleanest legend usually tells only half the story. ${domain.caution.en.charAt(0).toUpperCase()}${domain.caution.en.slice(1)}`,
+        },
+        era: topic.era, cluster: { zh: cluster[0], en: cluster[1] }, clusterIndex: topic.cluster,
+        level: topic.level, sourceIds: domain.sourceIds,
+      });
+    });
+  });
+
+  const prerequisites = [];
+  DOMAINS.forEach((_, di) => {
+    for (let ti = 1; ti < 12; ti += 1) {
+      prerequisites.push({ from: `d${String(di + 1).padStart(2,"0")}-c${String(ti).padStart(2,"0")}`, to: `d${String(di + 1).padStart(2,"0")}-c${String(ti + 1).padStart(2,"0")}`, type: "hard" });
+      if (ti >= 2) prerequisites.push({ from: `d${String(di + 1).padStart(2,"0")}-c${String(ti - 1).padStart(2,"0")}`, to: `d${String(di + 1).padStart(2,"0")}-c${String(ti + 1).padStart(2,"0")}`, type: "soft" });
+    }
+  });
+  for (let di = 1; di < DOMAINS.length; di += 1) {
+    prerequisites.push({ from: `d${String(di).padStart(2,"0")}-c12`, to: `d${String(di + 1).padStart(2,"0")}-c01`, type: "soft" });
+  }
+
+  const semantic = [];
+  const types = ["precedes","influences","adapts","enables","circulates","frames","documents","responds"];
+  DOMAINS.forEach((_, di) => {
+    for (let ti = 0; ti < 11; ti += 1) {
+      semantic.push({ from: `d${String(di + 1).padStart(2,"0")}-c${String(ti + 1).padStart(2,"0")}`, to: `d${String(di + 1).padStart(2,"0")}-c${String(ti + 2).padStart(2,"0")}`, type: types[(di + ti) % types.length] });
+    }
+    for (let ti = 0; ti < 8; ti += 1) {
+      semantic.push({ from: `d${String(di + 1).padStart(2,"0")}-c${String(ti + 1).padStart(2,"0")}`, to: `d${String(di + 1).padStart(2,"0")}-c${String(ti + 5).padStart(2,"0")}`, type: types[(di * 2 + ti + 3) % types.length] });
+    }
+  });
+  CROSS_LINKS.forEach(([from, to, type]) => semantic.push({ from, to, type }));
+
+  return { concepts, prerequisites, semantic };
+}
+
+function validateAtlas(atlas) {
+  const errors = [];
+  const ids = new Set();
+  const domainIds = new Set(DOMAINS.map((d) => d.id));
+  atlas.concepts.forEach((concept) => {
+    if (ids.has(concept.id)) errors.push(`Duplicate concept ID: ${concept.id}`);
+    ids.add(concept.id);
+    if (!domainIds.has(concept.domainId)) errors.push(`Unknown domain: ${concept.domainId}`);
+    if (!concept.title.zh || !concept.title.en) errors.push(`Missing title locale: ${concept.id}`);
+    if (!concept.summary.zh || !concept.summary.en) errors.push(`Missing summary locale: ${concept.id}`);
+    if (!concept.meaning.zh || !concept.meaning.en || !concept.evidence.zh || !concept.evidence.en) errors.push(`Missing story locale: ${concept.id}`);
+    concept.sourceIds.forEach((sourceId) => { if (!SOURCES[sourceId]) errors.push(`Unknown source ${sourceId}: ${concept.id}`); });
+  });
+  [...atlas.prerequisites, ...atlas.semantic].forEach((edge) => {
+    if (!ids.has(edge.from) || !ids.has(edge.to)) errors.push(`Dangling edge: ${edge.from} -> ${edge.to}`);
+    if (edge.from === edge.to) errors.push(`Self link: ${edge.from}`);
+  });
+  atlas.semantic.forEach((edge) => { if (!RELATION_TYPES[edge.type]) errors.push(`Unknown relation type: ${edge.type}`); });
+
+  const outgoing = new Map(atlas.concepts.map((c) => [c.id, []]));
+  const indegree = new Map(atlas.concepts.map((c) => [c.id, 0]));
+  atlas.prerequisites.forEach((edge) => { outgoing.get(edge.from).push(edge.to); indegree.set(edge.to, indegree.get(edge.to) + 1); });
+  const queue = [...indegree].filter(([, degree]) => degree === 0).map(([id]) => id);
+  let visited = 0;
+  while (queue.length) {
+    const id = queue.shift(); visited += 1;
+    outgoing.get(id).forEach((to) => { indegree.set(to, indegree.get(to) - 1); if (indegree.get(to) === 0) queue.push(to); });
+  }
+  if (visited !== atlas.concepts.length) errors.push("Prerequisite graph contains a cycle.");
+  if (DOMAINS.length !== 18) errors.push(`Expected 18 domains, got ${DOMAINS.length}`);
+  DOMAINS.forEach((domain) => { if (!STORY_PACKS[domain.id] || STORY_PACKS[domain.id].examples.length !== 4) errors.push(`Missing story pack: ${domain.id}`); });
+  if (atlas.concepts.length !== 216) errors.push(`Expected 216 concepts, got ${atlas.concepts.length}`);
+  return { ok: errors.length === 0, errors, stats: { domains: DOMAINS.length, concepts: atlas.concepts.length, prerequisiteEdges: atlas.prerequisites.length, semanticEdges: atlas.semantic.length, sources: Object.keys(SOURCES).length } };
+}
+
+//__VALIDATION_EXPORT__
+
+const ATLAS = buildAtlas();
+const VALIDATION = validateAtlas(ATLAS);
+if (!VALIDATION.ok) throw new Error(VALIDATION.errors.join("\n"));
+
+const conceptById = new Map(ATLAS.concepts.map((concept) => [concept.id, concept]));
+const domainById = new Map(DOMAINS.map((domain) => [domain.id, domain]));
+const app = document.getElementById("app");
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function stored(key, fallback) {
+  try { return localStorage.getItem(key) || fallback; } catch { return fallback; }
+}
+function persist(key, value) {
+  try { localStorage.setItem(key, value); } catch { /* local file privacy mode */ }
+}
+
+const state = {
+  locale: LOCALES.includes(stored("atlas-locale", "zh")) ? stored("atlas-locale", "zh") : "zh",
+  theme: ["dark","light"].includes(stored("atlas-theme", "")) ? stored("atlas-theme", "dark") : (matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"),
+  query: "",
+  domainId: null,
+  era: null,
+  relationType: "all",
+  selectedId: conceptById.has(location.hash.slice(1)) ? location.hash.slice(1) : null,
+  hoveredId: null,
+  mobileRail: false,
+  spin: 0,
+  view: { yaw: -0.12, pitch: 0.86, zoom: 1, panX: 0, panY: 35 },
+};
+
+document.documentElement.dataset.theme = state.theme;
+document.documentElement.lang = state.locale === "zh" ? "zh-Hant" : "en";
+
+const tx = () => UI[state.locale];
+const copy = (value) => value?.[state.locale] ?? value ?? "";
+const esc = (value) => String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
+const normalize = (value) => String(value ?? "").toLocaleLowerCase().normalize("NFKC").replace(/[’'–—/_-]/g, " ");
+
+function icon(name, size = 17) {
+  const paths = {
+    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-4.4-4.4"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/>',
+    moon: '<path d="M21 12.8A8.7 8.7 0 1 1 11.2 3 6.8 6.8 0 0 0 21 12.8Z"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    minus: '<path d="M5 12h14"/>',
+    reset: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+    menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+    close: '<path d="m6 6 12 12M18 6 6 18"/>',
+    arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  };
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]}</svg>`;
+}
+
+function searchableText(concept) {
+  const domain = domainById.get(concept.domainId);
+  return normalize([
+    concept.id, concept.title.zh, concept.title.en, concept.summary.zh, concept.summary.en,
+    concept.claim.zh, concept.claim.en, concept.meaning.zh, concept.meaning.en, concept.evidence.zh, concept.evidence.en,
+    concept.cluster.zh, concept.cluster.en, domain.title.zh, domain.title.en,
+    domain.subtitle.zh, domain.subtitle.en, ERAS[concept.era].zh, ERAS[concept.era].en,
+  ].join(" "));
+}
+
+function visibleConcepts() {
+  const query = normalize(state.query).trim();
+  return ATLAS.concepts.filter((concept) => {
+    if (state.domainId && concept.domainId !== state.domainId) return false;
+    if (state.era !== null && concept.era !== state.era) return false;
+    if (query && !searchableText(concept).includes(query)) return false;
+    return true;
+  });
+}
+
+function relationEntries(conceptId) {
+  return ATLAS.semantic
+    .filter((edge) => edge.from === conceptId || edge.to === conceptId)
+    .map((edge) => ({ ...edge, direction: edge.from === conceptId ? "out" : "in", otherId: edge.from === conceptId ? edge.to : edge.from }));
+}
+
+function renderShell() {
+  const t = tx();
+  const themeLabel = state.theme === "dark" ? t.light : t.dark;
+  app.innerHTML = `
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-copy">
+            <div class="brand-kicker">${esc(t.kicker)}</div>
+            <div class="brand-title">${esc(t.title)} <span lang="en">/ ATLAS</span></div>
+          </div>
+        </div>
+        <div class="search-wrap">
+          ${icon("search", 18)}
+          <label class="sr-only" for="atlasSearch">${esc(t.search)}</label>
+          <input id="atlasSearch" class="search-input" type="search" value="${esc(state.query)}" placeholder="${esc(t.search)}" autocomplete="off">
+          <span class="keycap">/</span>
+        </div>
+        <div class="top-actions">
+          <div class="segmented" role="group" aria-label="Language">
+            <button type="button" data-locale="zh" class="${state.locale === "zh" ? "active" : ""}">中</button>
+            <button type="button" data-locale="en" class="${state.locale === "en" ? "active" : ""}">EN</button>
+          </div>
+          <button id="themeToggle" class="icon-btn" type="button" aria-label="${esc(themeLabel)}" title="${esc(themeLabel)}">${icon(state.theme === "dark" ? "sun" : "moon")}</button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <aside id="domainRail" class="rail ${state.mobileRail ? "open" : ""}" aria-label="${esc(t.domains)}">
+          <div class="rail-head">
+            <div class="eyebrow">INDEX / 18</div>
+            <h2 class="rail-heading">${esc(t.domains)}</h2>
+            <div class="rail-summary">${esc(t.domainsSub)}</div>
+          </div>
+          <ul id="domainList" class="domain-list"></ul>
+        </aside>
+
+        <section class="stage" aria-label="${esc(t.graphTitle)}">
+          <button id="mobileDomainToggle" class="icon-btn mobile-domain-toggle" type="button" aria-label="${esc(t.openDomains)}">${icon("menu")}</button>
+          <div class="graph-caption">
+            <div class="graph-title">${esc(t.graphTitle)}</div>
+            <div class="graph-subtitle">${esc(t.graphSub)}</div>
+            <div class="live-pill ${state.selectedId ? "spinning" : ""}"><span class="live-dot"></span><span id="visibleCount"></span><span class="play-divider" ${state.selectedId ? "" : "hidden"}>/</span><span id="playState" class="play-state" ${state.selectedId ? "" : "hidden"}>${esc(t.playing)}</span></div>
+          </div>
+          <canvas id="graphCanvas" class="graph-canvas" tabindex="0" aria-label="${esc(t.graphTitle)}"></canvas>
+          <div class="canvas-toolbar" aria-label="Graph controls">
+            <button id="zoomIn" class="canvas-btn" type="button" aria-label="${esc(t.zoomIn)}" title="${esc(t.zoomIn)}">${icon("plus")}</button>
+            <button id="zoomOut" class="canvas-btn" type="button" aria-label="${esc(t.zoomOut)}" title="${esc(t.zoomOut)}">${icon("minus")}</button>
+            <button id="resetView" class="canvas-btn" type="button" aria-label="${esc(t.reset)}" title="${esc(t.reset)}">${icon("reset")}</button>
+          </div>
+          <div class="bottom-dock">
+            <div class="dock-top">
+              <div class="dock-label"><strong>${esc(t.timeline)}</strong><span>${esc(t.timelineSub)}</span></div>
+              <div id="eraTrack" class="era-track">
+                ${ERAS.map((era, index) => `<button type="button" class="era-btn ${state.era === index ? "active" : ""}" data-era="${index}" data-short="${esc(era.short)}">${esc(copy(era))}</button>`).join("")}
+              </div>
+            </div>
+            <div id="relationRow" class="relation-row">
+              <span class="relation-label">${esc(t.relations)}</span>
+              <button type="button" class="filter-btn ${state.relationType === "all" ? "active" : ""}" data-relation="all">${esc(t.all)}</button>
+              ${Object.entries(RELATION_TYPES).map(([key, label]) => `<button type="button" class="filter-btn ${state.relationType === key ? "active" : ""}" data-relation="${key}">${esc(copy(label))}</button>`).join("")}
+            </div>
+          </div>
+        </section>
+
+        <aside id="detailPanel" class="detail-panel" aria-live="polite"></aside>
+      </div>
+      <div id="graphTooltip" class="tooltip" role="tooltip"></div>
+    </main>`;
+
+  renderDomainList();
+  renderDetail();
+  bindShell();
+  refreshFilters();
+  setupCanvas();
+}
+
+function renderDomainList() {
+  const list = document.getElementById("domainList");
+  if (!list) return;
+  list.innerHTML = DOMAINS.map((domain) => `
+    <li>
+      <button type="button" class="domain-btn ${state.domainId === domain.id ? "active" : ""}" data-domain="${domain.id}" style="--domain:${domain.color}" title="${esc(copy(domain.subtitle))}">
+        <span class="domain-code">${domain.code}</span>
+        <span class="domain-name">${esc(copy(domain.title))}</span>
+        <span class="domain-count">12</span>
+      </button>
+    </li>`).join("");
+}
+
+function renderDetail() {
+  const panel = document.getElementById("detailPanel");
+  if (!panel) return;
+  const t = tx();
+  const concept = state.selectedId ? conceptById.get(state.selectedId) : null;
+  if (!concept) {
+    panel.classList.remove("open");
+    panel.innerHTML = `
+      <div class="detail-empty">
+        <div class="empty-disc" aria-hidden="true"></div>
+        <div class="eyebrow">LISTEN / TRACE / QUESTION</div>
+        <h2>${esc(t.selectPrompt)}</h2>
+        <p>${esc(t.selectBody)}</p>
+        <div class="mini-stats">
+          <div class="mini-stat"><strong>18</strong><span>${esc(t.domainsStat)}</span></div>
+          <div class="mini-stat"><strong>216</strong><span>${esc(t.nodesStat)}</span></div>
+          <div class="mini-stat"><strong>${ATLAS.semantic.length}</strong><span>${esc(t.linksStat)}</span></div>
+        </div>
+        <div class="detail-section">
+          <h3 class="section-label">${esc(t.accessibleSelect)}</h3>
+          ${semanticSelectMarkup(null)}
+        </div>
+      </div>`;
+    bindSemanticSelect();
+    return;
+  }
+
+  const domain = domainById.get(concept.domainId);
+  const entries = relationEntries(concept.id).slice(0, 14);
+  panel.innerHTML = `
+    <div class="detail-content" style="--node-color:${concept.color}">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button id="closeDetail" class="icon-btn" type="button" aria-label="${esc(t.close)}">${icon("close")}</button></div>
+      <div class="detail-head">
+        <div class="node-emblem">${domain.code}</div>
+        <div>
+          <div class="detail-domain">${esc(domain.code)} · ${esc(copy(domain.title))}</div>
+          <h2 class="detail-title">${esc(copy(concept.title))}</h2>
+          <div class="detail-meta">
+            <span class="tag level-${concept.level}">${esc(t[concept.level])}</span>
+            <span class="tag">${esc(copy(ERAS[concept.era]))}</span>
+            <span class="tag">${esc(copy(concept.cluster))}</span>
+          </div>
+        </div>
+      </div>
+      <div class="detail-section"><p>${esc(copy(concept.summary))}</p></div>
+      <section class="detail-section">
+        <h3 class="section-label">${esc(t.claim)}</h3>
+        <div class="claim-box"><p>${esc(copy(concept.claim))}</p></div>
+      </section>
+      <section class="detail-section">
+        <h3 class="section-label">${esc(t.meaning)}</h3>
+        <div class="meaning-box"><p>${esc(copy(concept.meaning))}</p></div>
+      </section>
+      <section class="detail-section">
+        <h3 class="section-label">${esc(t.evidence)}</h3>
+        <div class="street-scene"><span class="scene-mark">BX</span><p>${esc(copy(concept.evidence))}</p></div>
+      </section>
+      <section class="detail-section">
+        <h3 class="section-label">${esc(t.caution)}</h3>
+        <div class="caution-tape"><p>${esc(copy(concept.caution))}</p></div>
+      </section>
+      <section class="detail-section">
+        <h3 class="section-label">${esc(t.connections)} · ${entries.length}</h3>
+        <div class="relation-list">
+          ${entries.map((entry) => {
+            const other = conceptById.get(entry.otherId);
+            const direction = entry.direction === "out" ? t.outgoing : t.incoming;
+            return `<button type="button" class="relation-item" data-concept="${other.id}"><span class="relation-type">${esc(direction)} · ${esc(copy(RELATION_TYPES[entry.type]))}</span>${esc(copy(other.title))}</button>`;
+          }).join("") || `<p>${esc(t.emptySearch)}</p>`}
+        </div>
+      </section>
+      <section class="detail-section">
+        <h3 class="section-label">${esc(t.sources)}</h3>
+        <div class="source-list">
+          ${concept.sourceIds.map((sourceId) => { const source = SOURCES[sourceId]; return `<a class="source-item" href="${esc(source.url)}" target="_blank" rel="noreferrer"><strong>${esc(source.title)}</strong><span class="source-publisher">${esc(source.publisher)}</span></a>`; }).join("")}
+        </div>
+      </section>
+      <section class="detail-section">
+        <h3 class="section-label">${esc(t.accessibleSelect)}</h3>
+        ${semanticSelectMarkup(concept.id)}
+      </section>
+    </div>`;
+  if (innerWidth <= 900) panel.classList.add("open");
+  panel.querySelector("#closeDetail")?.addEventListener("click", () => selectConcept(null));
+  panel.querySelectorAll("[data-concept]").forEach((button) => button.addEventListener("click", () => selectConcept(button.dataset.concept)));
+  bindSemanticSelect();
+}
+
+function semanticSelectMarkup(selectedId) {
+  const t = tx();
+  return `<label class="sr-only" for="semanticSelect">${esc(t.accessibleSelect)}</label><select id="semanticSelect" class="semantic-select"><option value="">${esc(t.selectNode)}</option>${ATLAS.concepts.map((concept) => `<option value="${concept.id}" ${selectedId === concept.id ? "selected" : ""}>${esc(domainById.get(concept.domainId).code)} · ${esc(copy(concept.title))}</option>`).join("")}</select>`;
+}
+
+function bindSemanticSelect() {
+  document.getElementById("semanticSelect")?.addEventListener("change", (event) => { if (event.target.value) selectConcept(event.target.value); });
+}
+
+function selectConcept(id) {
+  state.selectedId = id;
+  try { history.replaceState(null, "", id ? `#${id}` : `${location.pathname}${location.search}`); } catch { /* local file navigation */ }
+  renderDetail();
+  updatePlaybackUI();
+  scheduleDraw();
+}
+
+function updatePlaybackUI() {
+  const pill = document.querySelector(".live-pill");
+  const stateLabel = document.getElementById("playState");
+  const divider = document.querySelector(".play-divider");
+  const playing = Boolean(state.selectedId);
+  pill?.classList.toggle("spinning", playing);
+  if (stateLabel) { stateLabel.hidden = !playing; stateLabel.textContent = tx().playing; }
+  if (divider) divider.hidden = !playing;
+}
+
+function bindShell() {
+  const search = document.getElementById("atlasSearch");
+  search.addEventListener("input", () => { state.query = search.value; refreshFilters(); });
+  search.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") { const first = visibleConcepts()[0]; if (first) selectConcept(first.id); }
+  });
+  document.querySelectorAll("[data-locale]").forEach((button) => button.addEventListener("click", () => {
+    state.locale = button.dataset.locale; persist("atlas-locale", state.locale); document.documentElement.lang = state.locale === "zh" ? "zh-Hant" : "en"; renderShell();
+  }));
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    state.theme = state.theme === "dark" ? "light" : "dark"; persist("atlas-theme", state.theme); document.documentElement.dataset.theme = state.theme; renderShell();
+  });
+  document.getElementById("domainList").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-domain]"); if (!button) return;
+    state.domainId = state.domainId === button.dataset.domain ? null : button.dataset.domain;
+    if (innerWidth <= 900) { state.mobileRail = false; document.getElementById("domainRail").classList.remove("open"); }
+    renderDomainList(); refreshFilters();
+  });
+  document.getElementById("eraTrack").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-era]"); if (!button) return;
+    const value = Number(button.dataset.era); state.era = state.era === value ? null : value; refreshFilters();
+  });
+  document.getElementById("relationRow").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-relation]"); if (!button) return;
+    state.relationType = button.dataset.relation; refreshFilters();
+  });
+  document.getElementById("mobileDomainToggle").addEventListener("click", () => {
+    state.mobileRail = !state.mobileRail; document.getElementById("domainRail").classList.toggle("open", state.mobileRail);
+  });
+  document.getElementById("zoomIn").addEventListener("click", () => { state.view.zoom = Math.min(2.5, state.view.zoom * 1.15); scheduleDraw(); });
+  document.getElementById("zoomOut").addEventListener("click", () => { state.view.zoom = Math.max(.48, state.view.zoom / 1.15); scheduleDraw(); });
+  document.getElementById("resetView").addEventListener("click", resetView);
+}
+
+function resetView() {
+  state.view = { yaw: -0.12, pitch: 0.86, zoom: 1, panX: 0, panY: 35 };
+  scheduleDraw();
+}
+
+function refreshFilters() {
+  const t = tx();
+  const visible = visibleConcepts();
+  const counter = document.getElementById("visibleCount");
+  if (counter) counter.textContent = `${t.visible} ${visible.length} / 216 ${t.nodes}`;
+  updatePlaybackUI();
+  document.querySelectorAll("[data-era]").forEach((button) => button.classList.toggle("active", Number(button.dataset.era) === state.era));
+  document.querySelectorAll("[data-relation]").forEach((button) => button.classList.toggle("active", button.dataset.relation === state.relationType));
+  scheduleDraw();
+}
+
+let canvasController = null;
+let drawQueued = false;
+let lastDrawTime = 0;
+function scheduleDraw() {
+  if (drawQueued) return;
+  drawQueued = true;
+  requestAnimationFrame((now) => {
+    drawQueued = false;
+    if (state.selectedId && !reduceMotion) {
+      const elapsed = lastDrawTime ? Math.min(50, now - lastDrawTime) : 16;
+      state.spin = (state.spin + elapsed * .00012) % (Math.PI * 2);
+    }
+    lastDrawTime = now;
+    canvasController?.draw();
+    if (state.selectedId && !reduceMotion) scheduleDraw();
+  });
+}
+
+function setupCanvas() {
+  canvasController?.destroy?.();
+  const canvas = document.getElementById("graphCanvas");
+  const ctx = canvas.getContext("2d");
+  const tooltip = document.getElementById("graphTooltip");
+  let width = 0, height = 0, dpr = 1, hitNodes = [], destroyed = false;
+  let drag = null, moved = 0, pinch = null;
+  const pointers = new Map();
+
+  const observer = new ResizeObserver(() => resize());
+  observer.observe(canvas);
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    width = Math.max(1, rect.width); height = Math.max(1, rect.height);
+    canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); scheduleDraw();
+  }
+
+  function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function rgba(hex, alpha) {
+    const value = hex.replace("#", "");
+    const n = parseInt(value.length === 3 ? value.split("").map((c) => c + c).join("") : value, 16);
+    return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
+  }
+
+  function basePosition(concept, radiusOverride = null) {
+    const domainAngle = (concept.domainIndex / DOMAINS.length) * Math.PI * 2 - Math.PI / 2;
+    const local = (concept.order % 3) - 1;
+    const angle = domainAngle + state.spin + local * 0.024 + (concept.clusterIndex - 1.5) * 0.008;
+    const radius = radiusOverride ?? (.24 + concept.clusterIndex * .145 + (concept.order % 3) * .038);
+    const levelHeight = concept.level === "foundation" ? -.03 : concept.level === "advanced" ? .055 : .012;
+    return { x: Math.cos(angle) * radius, y: levelHeight + (concept.era - 3.5) * .007, z: Math.sin(angle) * radius };
+  }
+
+  function project(point) {
+    const { yaw, pitch, zoom, panX, panY } = state.view;
+    const cy = Math.cos(yaw), sy = Math.sin(yaw);
+    const x1 = point.x * cy - point.z * sy;
+    const z1 = point.x * sy + point.z * cy;
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const y2 = point.y * cp - z1 * sp;
+    const z2 = point.y * sp + z1 * cp;
+    const perspective = 1 / (1 + z2 * .52);
+    const base = Math.min(width, height) * .78;
+    return {
+      x: width / 2 + x1 * base * zoom * perspective + panX,
+      y: height / 2 + y2 * base * zoom * perspective + panY,
+      z: z2, scale: perspective * zoom,
+    };
+  }
+
+  function drawGrooves(colors) {
+    ctx.save();
+    const discRadius = .79;
+    const center = project({ x: 0, y: -.052, z: 0 });
+    const edge = project({ x: discRadius, y: -.052, z: 0 });
+    ctx.beginPath();
+    for (let i = 0; i <= 128; i += 1) {
+      const angle = i / 128 * Math.PI * 2;
+      const p = project({ x: Math.cos(angle) * discRadius, y: -.052, z: Math.sin(angle) * discRadius });
+      if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+    }
+    ctx.closePath();
+    ctx.shadowColor = state.theme === "dark" ? "rgba(0,0,0,.72)" : "rgba(35,24,18,.3)";
+    ctx.shadowBlur = 36;
+    ctx.shadowOffsetY = 18;
+    const record = ctx.createRadialGradient(center.x - Math.abs(edge.x - center.x) * .2, center.y - 26, 4, center.x, center.y, Math.max(120, Math.abs(edge.x - center.x) * 1.12));
+    record.addColorStop(0, state.theme === "dark" ? "#2c2c30" : "#353238");
+    record.addColorStop(.22, "#111114");
+    record.addColorStop(.46, "#28272b");
+    record.addColorStop(.63, "#0a0a0c");
+    record.addColorStop(.82, "#202024");
+    record.addColorStop(1, "#050507");
+    ctx.fillStyle = record;
+    ctx.fill();
+    ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+    ctx.strokeStyle = state.theme === "dark" ? "rgba(255,255,255,.18)" : "rgba(10,8,7,.5)";
+    ctx.lineWidth = 2.2; ctx.stroke();
+
+    for (let ring = .12; ring <= .76; ring += .032) {
+      ctx.beginPath();
+      const segments = 96;
+      for (let i = 0; i <= segments; i += 1) {
+        const angle = i / segments * Math.PI * 2;
+        const p = project({ x: Math.cos(angle) * ring, y: -.045, z: Math.sin(angle) * ring });
+        if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = colors.groove;
+      ctx.lineWidth = ring % .064 < .015 ? 1 : .45;
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    for (let i = 0; i <= 72; i += 1) {
+      const angle = i / 72 * Math.PI * 2;
+      const p = project({ x: Math.cos(angle) * .118, y: -.056, z: Math.sin(angle) * .118 });
+      if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+    }
+    ctx.closePath();
+    const label = ctx.createLinearGradient(center.x - 40, center.y - 18, center.x + 42, center.y + 18);
+    label.addColorStop(0, "#ee352e"); label.addColorStop(.48, "#ff6b3f"); label.addColorStop(1, "#a71920");
+    ctx.fillStyle = label; ctx.fill();
+    ctx.strokeStyle = "rgba(255,245,224,.42)"; ctx.lineWidth = .8; ctx.stroke();
+    ctx.beginPath(); ctx.arc(center.x, center.y, Math.max(2.2, 3.2 * state.view.zoom), 0, Math.PI * 2); ctx.fillStyle = "#efe4cf"; ctx.fill();
+    ctx.fillStyle = "rgba(255,248,232,.82)"; ctx.font = `900 ${Math.max(7, 8 * state.view.zoom)}px ui-sans-serif, system-ui`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("BX", center.x, center.y - 9 * state.view.zoom);
+    const rotationMark = project({ x: Math.cos(state.spin) * .071, y: -.058, z: Math.sin(state.spin) * .071 });
+    ctx.beginPath(); ctx.arc(rotationMark.x, rotationMark.y, Math.max(1.3, 1.8 * state.view.zoom), 0, Math.PI * 2); ctx.fillStyle = "rgba(255,248,232,.88)"; ctx.fill();
+
+    DOMAINS.forEach((domain, index) => {
+      const a = index / DOMAINS.length * Math.PI * 2 - Math.PI / 2 + state.spin;
+      const inner = project({ x: Math.cos(a) * .17, y: -.04, z: Math.sin(a) * .17 });
+      const outer = project({ x: Math.cos(a) * .77, y: -.04, z: Math.sin(a) * .77 });
+      ctx.beginPath(); ctx.moveTo(inner.x, inner.y); ctx.lineTo(outer.x, outer.y);
+      ctx.strokeStyle = rgba(domain.color, state.theme === "dark" ? .13 : .18); ctx.lineWidth = .8; ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  function drawDomainLabels(colors) {
+    if (state.domainId || state.view.zoom < .72 || width < 620) return;
+    ctx.save();
+    ctx.font = `700 ${Math.max(8, Math.min(10, width / 105))}px ui-sans-serif, system-ui`;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    DOMAINS.forEach((domain, index) => {
+      const angle = index / DOMAINS.length * Math.PI * 2 - Math.PI / 2 + state.spin;
+      const p = project({ x: Math.cos(angle) * .84, y: -.03, z: Math.sin(angle) * .84 });
+      if (p.z < .3) {
+        ctx.fillStyle = rgba(domain.color, state.theme === "dark" ? .78 : .92);
+        ctx.fillText(domain.code, p.x, p.y);
+      }
+    });
+    ctx.restore();
+  }
+
+  function drawEdge(edge, positions, visibleSet, colors) {
+    if (!visibleSet.has(edge.from) || !visibleSet.has(edge.to)) return;
+    if (state.relationType !== "all" && edge.type !== state.relationType) return;
+    const from = positions.get(edge.from), to = positions.get(edge.to);
+    if (!from || !to) return;
+    const selected = state.selectedId && (edge.from === state.selectedId || edge.to === state.selectedId);
+    const hovered = state.hoveredId && (edge.from === state.hoveredId || edge.to === state.hoveredId);
+    const fromConcept = conceptById.get(edge.from);
+    ctx.beginPath(); ctx.moveTo(from.x, from.y);
+    const mx = (from.x + to.x) / 2 + (height / 2 - (from.y + to.y) / 2) * .035;
+    const my = (from.y + to.y) / 2 - Math.min(18, Math.abs(from.x - to.x) * .025);
+    ctx.quadraticCurveTo(mx, my, to.x, to.y);
+    ctx.strokeStyle = selected ? rgba(fromConcept.color, .88) : hovered ? rgba(fromConcept.color, .55) : colors.edge;
+    ctx.lineWidth = selected ? 1.65 : hovered ? 1.1 : .48;
+    ctx.stroke();
+  }
+
+  function drawNode(item, colors, queryActive) {
+    const { concept, point } = item;
+    const selected = concept.id === state.selectedId;
+    const hovered = concept.id === state.hoveredId;
+    let radius = Math.max(3.4, 4.5 * point.scale);
+    if (state.domainId) radius *= 1.18;
+    if (selected) radius = Math.max(radius * 1.5, 9);
+    else if (hovered) radius = Math.max(radius * 1.3, 7.2);
+    if (queryActive) radius *= 1.08;
+
+    ctx.save();
+    if (selected || hovered || queryActive) {
+      ctx.shadowColor = rgba(concept.color, selected ? .85 : .55);
+      ctx.shadowBlur = selected ? 22 : 13;
+    }
+    const gradient = ctx.createRadialGradient(point.x - radius * .28, point.y - radius * .35, radius * .05, point.x, point.y, radius);
+    gradient.addColorStop(0, state.theme === "dark" ? "#fff3d7" : "#fffaf0");
+    gradient.addColorStop(.12, concept.color);
+    gradient.addColorStop(.46, state.theme === "dark" ? "#242328" : "#51473f");
+    gradient.addColorStop(.58, concept.color);
+    gradient.addColorStop(.71, state.theme === "dark" ? "#0d0d10" : "#29231f");
+    gradient.addColorStop(1, state.theme === "dark" ? "#030305" : "#171310");
+    ctx.beginPath(); ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); ctx.fillStyle = gradient; ctx.fill();
+    ctx.shadowBlur = 0;
+    ctx.beginPath(); ctx.arc(point.x, point.y, radius, 0, Math.PI * 2); ctx.strokeStyle = selected ? colors.ink : rgba(concept.color, .68); ctx.lineWidth = selected ? 1.5 : .7; ctx.stroke();
+    ctx.beginPath(); ctx.arc(point.x, point.y, Math.max(1, radius * .14), 0, Math.PI * 2); ctx.fillStyle = colors.paper; ctx.fill();
+
+    const shouldLabel = selected || hovered || queryActive || (state.domainId && state.view.zoom > .7) || state.view.zoom > 1.65;
+    if (shouldLabel) {
+      const label = copy(concept.title);
+      ctx.font = `${selected ? 760 : 650} ${selected ? 12 : 10}px ui-sans-serif, system-ui`;
+      ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+      const maxWidth = Math.min(210, Math.max(90, ctx.measureText(label).width + 14));
+      const labelX = point.x, labelY = point.y - radius - 7;
+      ctx.fillStyle = colors.labelBg;
+      roundRect(ctx, labelX - maxWidth / 2, labelY - 19, maxWidth, 18, 6); ctx.fill();
+      ctx.fillStyle = colors.ink; ctx.fillText(trimLabel(label, selected ? 32 : 22), labelX, labelY - 4);
+    }
+    ctx.restore();
+    hitNodes.push({ id: concept.id, x: point.x, y: point.y, radius: Math.max(12, radius + 5), z: point.z });
+  }
+
+  function roundRect(context, x, y, w, h, r) {
+    const radius = Math.min(r, w / 2, h / 2);
+    context.beginPath(); context.moveTo(x + radius, y); context.arcTo(x + w, y, x + w, y + h, radius); context.arcTo(x + w, y + h, x, y + h, radius); context.arcTo(x, y + h, x, y, radius); context.arcTo(x, y, x + w, y, radius); context.closePath();
+  }
+  function trimLabel(label, max) { return label.length > max ? `${label.slice(0, max - 1)}…` : label; }
+
+  function draw() {
+    if (destroyed || !width || !height) return;
+    ctx.clearRect(0, 0, width, height);
+    const colors = {
+      ink: css("--ink"), paper: css("--paper"),
+      groove: state.theme === "dark" ? "rgba(255,255,255,.055)" : "rgba(40,30,24,.095)",
+      edge: state.theme === "dark" ? "rgba(202,194,182,.095)" : "rgba(58,45,35,.13)",
+      labelBg: state.theme === "dark" ? "rgba(13,13,16,.92)" : "rgba(252,248,239,.94)",
+    };
+    drawGrooves(colors);
+    drawDomainLabels(colors);
+    const visible = visibleConcepts();
+    const visibleSet = new Set(visible.map((concept) => concept.id));
+    const positions = new Map(ATLAS.concepts.map((concept) => [concept.id, project(basePosition(concept))]));
+    ATLAS.semantic.forEach((edge) => drawEdge(edge, positions, visibleSet, colors));
+    hitNodes = [];
+    const queryActive = normalize(state.query).trim().length > 0;
+    visible.map((concept) => ({ concept, point: positions.get(concept.id) })).sort((a, b) => b.point.z - a.point.z).forEach((item) => drawNode(item, colors, queryActive));
+    if (!visible.length) {
+      ctx.fillStyle = colors.ink; ctx.font = "600 13px ui-sans-serif, system-ui"; ctx.textAlign = "center"; ctx.fillText(tx().emptySearch, width / 2, height / 2);
+    }
+  }
+
+  function localPoint(event) { const rect = canvas.getBoundingClientRect(); return { x: event.clientX - rect.left, y: event.clientY - rect.top }; }
+  function hit(point) {
+    return hitNodes.filter((node) => Math.hypot(point.x - node.x, point.y - node.y) <= node.radius).sort((a, b) => a.z - b.z)[0] || null;
+  }
+  function updateTooltip(event, node) {
+    if (!node || drag) { tooltip.classList.remove("visible"); return; }
+    const concept = conceptById.get(node.id); const domain = domainById.get(concept.domainId);
+    tooltip.innerHTML = `<strong>${esc(copy(concept.title))}</strong><small>${esc(domain.code)} · ${esc(copy(domain.title))} · ${esc(copy(ERAS[concept.era]))}</small>`;
+    tooltip.style.left = `${event.clientX}px`; tooltip.style.top = `${event.clientY}px`; tooltip.classList.add("visible");
+  }
+
+  function onPointerDown(event) {
+    canvas.setPointerCapture(event.pointerId); pointers.set(event.pointerId, localPoint(event));
+    if (pointers.size === 2) {
+      const [a,b] = [...pointers.values()]; pinch = { distance: Math.hypot(a.x-b.x,a.y-b.y), zoom: state.view.zoom, center: { x:(a.x+b.x)/2, y:(a.y+b.y)/2 } }; drag = null;
+    } else {
+      const p = localPoint(event); drag = { start: p, last: p, pan: event.button === 2 || event.shiftKey }; moved = 0;
+    }
+    canvas.classList.add("dragging"); tooltip.classList.remove("visible");
+  }
+  function onPointerMove(event) {
+    const p = localPoint(event);
+    if (pointers.has(event.pointerId)) pointers.set(event.pointerId, p);
+    if (pointers.size >= 2 && pinch) {
+      const [a,b] = [...pointers.values()]; const distance = Math.max(1, Math.hypot(a.x-b.x,a.y-b.y));
+      state.view.zoom = Math.max(.48, Math.min(2.5, pinch.zoom * distance / pinch.distance)); scheduleDraw(); return;
+    }
+    if (drag) {
+      const dx = p.x - drag.last.x, dy = p.y - drag.last.y; moved += Math.abs(dx) + Math.abs(dy);
+      if (drag.pan) { state.view.panX += dx; state.view.panY += dy; }
+      else { state.view.yaw += dx * .006; state.view.pitch = Math.max(.34, Math.min(1.24, state.view.pitch + dy * .004)); }
+      drag.last = p; scheduleDraw(); return;
+    }
+    const node = hit(p); const next = node?.id || null;
+    if (state.hoveredId !== next) { state.hoveredId = next; scheduleDraw(); }
+    updateTooltip(event, node);
+  }
+  function onPointerUp(event) {
+    const p = localPoint(event); pointers.delete(event.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (drag && moved < 8) { const node = hit(p); if (node) selectConcept(node.id); }
+    drag = null; canvas.classList.remove("dragging");
+  }
+  function onWheel(event) {
+    event.preventDefault(); const factor = Math.exp(-event.deltaY * .0012); state.view.zoom = Math.max(.48, Math.min(2.5, state.view.zoom * factor)); scheduleDraw();
+  }
+  function onKey(event) {
+    const nodes = visibleConcepts(); const current = nodes.findIndex((concept) => concept.id === state.selectedId);
+    if (["ArrowRight","ArrowDown","ArrowLeft","ArrowUp"].includes(event.key)) {
+      event.preventDefault(); const step = ["ArrowRight","ArrowDown"].includes(event.key) ? 1 : -1; const next = nodes[(Math.max(0,current) + step + nodes.length) % nodes.length]; if (next) selectConcept(next.id);
+    } else if (event.key === "+" || event.key === "=") { state.view.zoom = Math.min(2.5,state.view.zoom*1.12); scheduleDraw(); }
+    else if (event.key === "-") { state.view.zoom = Math.max(.48,state.view.zoom/1.12); scheduleDraw(); }
+    else if (event.key === "0") resetView();
+  }
+
+  canvas.addEventListener("pointerdown", onPointerDown);
+  canvas.addEventListener("pointermove", onPointerMove);
+  canvas.addEventListener("pointerup", onPointerUp);
+  canvas.addEventListener("pointercancel", onPointerUp);
+  canvas.addEventListener("pointerleave", () => { if (!drag) { state.hoveredId = null; tooltip.classList.remove("visible"); scheduleDraw(); } });
+  canvas.addEventListener("wheel", onWheel, { passive: false });
+  canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+  canvas.addEventListener("dblclick", resetView);
+  canvas.addEventListener("keydown", onKey);
+  resize();
+  canvasController = { draw, destroy: () => { destroyed = true; observer.disconnect(); } };
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "/" && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "SELECT") {
+    event.preventDefault(); document.getElementById("atlasSearch")?.focus();
+  }
+  if (event.key === "Escape") {
+    if (state.query) { state.query = ""; const input = document.getElementById("atlasSearch"); if (input) input.value = ""; refreshFilters(); }
+    else if (state.selectedId) selectConcept(null);
+    else if (state.mobileRail) { state.mobileRail = false; document.getElementById("domainRail")?.classList.remove("open"); }
+  }
+});
+
+renderShell();
